@@ -29,5 +29,12 @@ namespace LibraryManagementSystem.Infrastructure.Interfaces
         /// <param name="toDate">The to date to lookup top borrowers.</param>
         /// <returns>A list of <see cref="TopBorrowerDetail"/>s.</returns>
         Task<List<TopBorrowerDetail>> GetTopBorrowers(int numberOfBorrowers, DateTime fromDate, DateTime toDate);
+
+        /// <summary>
+        /// Get the borrowers borrowed book count for each time frame.
+        /// </summary>
+        /// <param name="borrowId">Borrow id to lookup.</param>
+        /// <returns>A list of <see cref="BorrowerBorrowedTimeFrameCount"/>s.</returns>
+        Task<List<BorrowerBorrowedTimeFrameCount>> GetBorrowersBorrowedBookCountForEachTimeFrame(int borrowId);
     }
 }

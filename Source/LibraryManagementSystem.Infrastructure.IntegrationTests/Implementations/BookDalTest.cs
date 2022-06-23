@@ -49,7 +49,7 @@ namespace LibraryManagementSystem.Infrastructure.IntegrationTests.Implementation
             // Assert
             Assert.Equal(numberOfTopBooks, topBorrowedBooks.Count);
 
-            for (var i = 0; i < topBorrowedBooksData.Count; i++)
+            for (var i = 0; i < topBorrowedBooks.Count; i++)
             {
                 Assert.Equal(topBorrowedBooksData[i], topBorrowedBooks[i].Title);
                 _outputHelper.WriteLine($"One of the top books is: {topBorrowedBooks[i].Title}.");
@@ -126,10 +126,47 @@ namespace LibraryManagementSystem.Infrastructure.IntegrationTests.Implementation
             // Assert
             Assert.Equal(expectedNumberOfBorrowers, topBorrowers.Count);
             
-            for (var i = 0; i < topBorrowersData.Count; i++)
+            for (var i = 0; i < topBorrowers.Count; i++)
             {
                 Assert.Equal(topBorrowersData[i], $"{topBorrowers[i].FirstName} {topBorrowers[i].LastName}");
                 _outputHelper.WriteLine($"One of the top borrowers are: {topBorrowers[i].FirstName} {topBorrowers[i].LastName}.");
+            }
+        }
+
+        /// <summary>
+        /// Get the borrowers borrowed book count for each time frame.
+        /// </summary>
+        [Theory]
+        [MemberData(nameof(BookDalTestMemberData.BorrowerBorrowedTimeFrameCountData), MemberType = typeof(BookDalTestMemberData))]
+        public async Task GetBorrowersBorrowedBookCountForEachTimeFrame(int borrowerId, List<DateTime> fromDateTimeFrameData, List<DateTime> toDateTimeFrameData, List<int> booksLoaned)
+        {
+            // Arrange
+            List<BorrowerBorrowedTimeFrameCount> borrowerBorrowedTimeFrameCount;
+
+            await using var sqlConnection = new SqlConnection(_commonHelper.Settings.Database.ConnectionString);
+            await sqlConnection.OpenAsync();
+            var sqlCommand = sqlConnection.CreateCommand();
+            var sqlTransaction = sqlConnection.BeginTransaction();
+            sqlCommand.Transaction = sqlTransaction;
+
+            await CommonHelper.AddTestDataToDatabase(sqlCommand);
+
+            // Act
+            try
+            {
+                borrowerBorrowedTimeFrameCount = await BookDal.GetBorrowersBorrowedBookCountForEachTimeFrame(sqlCommand, borrowerId);
+            }
+            finally
+            {
+                await sqlTransaction.RollbackAsync();
+            }
+
+            // Assert
+            for (var i = 0; i < borrowerBorrowedTimeFrameCount.Count; i++)
+            {
+                Assert.Equal(fromDateTimeFrameData[i], borrowerBorrowedTimeFrameCount[i].FromDate);
+                Assert.Equal(toDateTimeFrameData[i], borrowerBorrowedTimeFrameCount[i].ToDate);
+                Assert.Equal(booksLoaned[i], borrowerBorrowedTimeFrameCount[i].BooksLoaned);
             }
         }
     }

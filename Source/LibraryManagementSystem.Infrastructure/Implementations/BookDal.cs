@@ -221,5 +221,70 @@ namespace LibraryManagementSystem.Infrastructure.Implementations
             return borrowers;
         }
 
+        /// <summary>
+        /// Get the borrowers borrowed book count for each time frame.
+        /// </summary>
+        /// <param name="borrowId">Borrow id to lookup.</param>
+        /// <returns>A list of <see cref="BorrowerBorrowedTimeFrameCount"/>s.</returns>
+        public async Task<List<BorrowerBorrowedTimeFrameCount>> GetBorrowersBorrowedBookCountForEachTimeFrame(int borrowId)
+        {
+            List<BorrowerBorrowedTimeFrameCount> borrowerBorrowedTimeFrameCount;
+
+            await using var sqlConnection = new SqlConnection(_connectionString);
+            await sqlConnection.OpenAsync();
+            var sqlCommand = sqlConnection.CreateCommand();
+            var sqlTransaction = sqlConnection.BeginTransaction();
+            sqlCommand.Transaction = sqlTransaction;
+
+            try
+            {
+                borrowerBorrowedTimeFrameCount = await GetBorrowersBorrowedBookCountForEachTimeFrame(sqlCommand, borrowId);
+
+                await sqlTransaction.CommitAsync();
+            }
+            catch (Exception exception)
+            {
+                Console.WriteLine(exception);
+
+                await sqlTransaction.RollbackAsync();
+
+                throw;
+            }
+
+            return borrowerBorrowedTimeFrameCount;
+        }
+
+        /// <summary>
+        /// Get the borrowers borrowed book count for each time frame.
+        /// </summary>
+        /// <param name="sqlCommand">The SqlCommand to use when interacting with the database.</param>
+        /// <param name="borrowId">Borrow id to lookup.</param>
+        /// <returns>A list of <see cref="BorrowerBorrowedTimeFrameCount"/>s.</returns>
+        public static async Task<List<BorrowerBorrowedTimeFrameCount>> GetBorrowersBorrowedBookCountForEachTimeFrame(SqlCommand sqlCommand, int borrowId)
+        {
+            var borrowerBorrowedTimeFrameCount = new List<BorrowerBorrowedTimeFrameCount>();
+
+            sqlCommand.CommandType = CommandType.StoredProcedure;
+            sqlCommand.CommandText = "[dbo].[borrowers_borrowed_book_count_for_each_time_frame_get]";
+            sqlCommand.Parameters.Clear();
+
+            sqlCommand.Parameters.Add("@borrower_id", SqlDbType.Int).Value = borrowId;
+
+            await using var sqlDataReader = await sqlCommand.ExecuteReaderAsync();
+            while (await sqlDataReader.ReadAsync())
+            {
+                var book = new BorrowerBorrowedTimeFrameCount
+                {
+                    FromDate = Convert.ToDateTime(sqlDataReader["from_date"]),
+                    ToDate = Convert.ToDateTime(sqlDataReader["to_date"]),
+                    BooksLoaned = Convert.ToInt32(sqlDataReader["books_loaned"])
+                };
+
+                borrowerBorrowedTimeFrameCount.Add(book);
+            }
+
+            return borrowerBorrowedTimeFrameCount;
+        }
+
     }
 }
