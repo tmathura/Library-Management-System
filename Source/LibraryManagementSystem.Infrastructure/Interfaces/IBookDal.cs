@@ -36,5 +36,12 @@ namespace LibraryManagementSystem.Infrastructure.Interfaces
         /// <param name="borrowId">Borrow id to lookup.</param>
         /// <returns>A list of <see cref="BorrowerBorrowedTimeFrameCount"/>s.</returns>
         Task<List<BorrowerBorrowedTimeFrameCount>> GetBorrowersBorrowedBookCountForEachTimeFrame(int borrowId);
+
+        /// <summary>
+        /// Get other books loaned by borrowers of a specific book.
+        /// </summary>
+        /// <param name="bookId">Borrow id to lookup.</param>
+        /// <returns>A list of <see cref="Book"/>s.</returns>
+        Task<List<Book>> GetOtherBooksLoanedByBorrowersOfASpecificBook(int bookId);
     }
 }

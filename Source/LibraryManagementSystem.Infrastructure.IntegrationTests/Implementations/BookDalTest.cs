@@ -19,11 +19,11 @@ namespace LibraryManagementSystem.Infrastructure.IntegrationTests.Implementation
         }
 
         /// <summary>
-        /// Get top {x} amount of books.
+        /// Test the top {x} amount of books is equal to the member data.
         /// </summary>
         [Theory]
         [MemberData(nameof(BookDalTestMemberData.TopBorrowedBooksData), MemberType = typeof(BookDalTestMemberData))]
-        public async Task GetTopBorrowedBooks(int numberOfTopBooks, List<string> topBorrowedBooksData)
+        public async Task GetTopBorrowedBooks(int numberOfTopBooks, List<int> topBorrowedBooksData)
         {
             // Arrange
             List<TopBookDetail> topBorrowedBooks;
@@ -51,13 +51,13 @@ namespace LibraryManagementSystem.Infrastructure.IntegrationTests.Implementation
 
             for (var i = 0; i < topBorrowedBooks.Count; i++)
             {
-                Assert.Equal(topBorrowedBooksData[i], topBorrowedBooks[i].Title);
+                Assert.Equal(topBorrowedBooksData[i], topBorrowedBooks[i].Id);
                 _outputHelper.WriteLine($"One of the top books is: {topBorrowedBooks[i].Title}.");
             }
         }
 
         /// <summary>
-        /// Get status (available, borrowed, lost) of a book.
+        /// Verify the status (available, borrowed, lost) of a book is equal to the member data.
         /// </summary>
         [Theory]
         [InlineData(1, 5, 0, 0)]
@@ -96,11 +96,11 @@ namespace LibraryManagementSystem.Infrastructure.IntegrationTests.Implementation
         }
 
         /// <summary>
-        /// Get top {x} borrows for a given time frame.
+        /// Test the top {x} borrows for a given time frame is equal to the member data.
         /// </summary>
         [Theory]
         [MemberData(nameof(BookDalTestMemberData.TopBorrowersData), MemberType = typeof(BookDalTestMemberData))]
-        public async Task GetTopBorrowers(int numberOfTopBorrowers, int expectedNumberOfBorrowers, List<string> topBorrowersData, DateTime fromDate, DateTime toDate)
+        public async Task GetTopBorrowers(int numberOfTopBorrowers, int expectedNumberOfBorrowers, List<int> topBorrowersData, DateTime fromDate, DateTime toDate)
         {
             // Arrange
             List<TopBorrowerDetail> topBorrowers;
@@ -128,13 +128,13 @@ namespace LibraryManagementSystem.Infrastructure.IntegrationTests.Implementation
             
             for (var i = 0; i < topBorrowers.Count; i++)
             {
-                Assert.Equal(topBorrowersData[i], $"{topBorrowers[i].FirstName} {topBorrowers[i].LastName}");
+                Assert.Equal(topBorrowersData[i], topBorrowers[i].Id);
                 _outputHelper.WriteLine($"One of the top borrowers are: {topBorrowers[i].FirstName} {topBorrowers[i].LastName}.");
             }
         }
 
         /// <summary>
-        /// Get the borrowers borrowed book count for each time frame.
+        /// Test the borrowers borrowed book count for each time frame is equal to what is in the member data.
         /// </summary>
         [Theory]
         [MemberData(nameof(BookDalTestMemberData.BorrowerBorrowedTimeFrameCountData), MemberType = typeof(BookDalTestMemberData))]
@@ -167,6 +167,44 @@ namespace LibraryManagementSystem.Infrastructure.IntegrationTests.Implementation
                 Assert.Equal(fromDateTimeFrameData[i], borrowerBorrowedTimeFrameCount[i].FromDate);
                 Assert.Equal(toDateTimeFrameData[i], borrowerBorrowedTimeFrameCount[i].ToDate);
                 Assert.Equal(booksLoaned[i], borrowerBorrowedTimeFrameCount[i].BooksLoaned);
+            }
+        }
+
+        /// <summary>
+        /// Test that the other books loaned by borrowers of a specific book matched the member data.
+        /// </summary>
+        [Theory]
+        [MemberData(nameof(BookDalTestMemberData.OtherBorrowedBooksData), MemberType = typeof(BookDalTestMemberData))]
+        public async Task GetOtherBooksLoanedByBorrowersOfASpecificBook(int bookId, int expectedBooks, List<int> otherBorrowedBooksData)
+        {
+            // Arrange
+            List<Book> books;
+
+            await using var sqlConnection = new SqlConnection(_commonHelper.Settings.Database.ConnectionString);
+            await sqlConnection.OpenAsync();
+            var sqlCommand = sqlConnection.CreateCommand();
+            var sqlTransaction = sqlConnection.BeginTransaction();
+            sqlCommand.Transaction = sqlTransaction;
+
+            await CommonHelper.AddTestDataToDatabase(sqlCommand);
+
+            // Act
+            try
+            {
+                books = await BookDal.GetOtherBooksLoanedByBorrowersOfASpecificBook(sqlCommand, bookId);
+            }
+            finally
+            {
+                await sqlTransaction.RollbackAsync();
+            }
+
+            // Assert
+            Assert.Equal(expectedBooks, books.Count);
+
+            for (var i = 0; i < books.Count; i++)
+            {
+                Assert.Equal(otherBorrowedBooksData[i], books[i].Id);
+                _outputHelper.WriteLine($"One of the other books are: {books[i].Title}.");
             }
         }
     }

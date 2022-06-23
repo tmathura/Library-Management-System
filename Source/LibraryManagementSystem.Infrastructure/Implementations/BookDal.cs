@@ -286,5 +286,74 @@ namespace LibraryManagementSystem.Infrastructure.Implementations
             return borrowerBorrowedTimeFrameCount;
         }
 
+        /// <summary>
+        /// Get other books loaned by borrowers of a specific book.
+        /// </summary>
+        /// <param name="bookId">Borrow id to lookup.</param>
+        /// <returns>A list of <see cref="Book"/>s.</returns>
+        public async Task<List<Book>> GetOtherBooksLoanedByBorrowersOfASpecificBook(int bookId)
+        {
+            List<Book> books;
+
+            await using var sqlConnection = new SqlConnection(_connectionString);
+            await sqlConnection.OpenAsync();
+            var sqlCommand = sqlConnection.CreateCommand();
+            var sqlTransaction = sqlConnection.BeginTransaction();
+            sqlCommand.Transaction = sqlTransaction;
+
+            try
+            {
+                books = await GetOtherBooksLoanedByBorrowersOfASpecificBook(sqlCommand, bookId);
+
+                await sqlTransaction.CommitAsync();
+            }
+            catch (Exception exception)
+            {
+                Console.WriteLine(exception);
+
+                await sqlTransaction.RollbackAsync();
+
+                throw;
+            }
+
+            return books;
+        }
+
+        /// <summary>
+        /// Get other books loaned by borrowers of a specific book.
+        /// </summary>
+        /// <param name="sqlCommand">The SqlCommand to use when interacting with the database.</param>
+        /// <param name="bookId">Borrow id to lookup.</param>
+        /// <returns>A list of <see cref="Book"/>s.</returns>
+        public static async Task<List<Book>> GetOtherBooksLoanedByBorrowersOfASpecificBook(SqlCommand sqlCommand, int bookId)
+        {
+            var books = new List<Book>();
+
+            sqlCommand.CommandType = CommandType.StoredProcedure;
+            sqlCommand.CommandText = "[dbo].[other_books_loaned_by_borrowers_of_a_specific_book_get]";
+            sqlCommand.Parameters.Clear();
+
+            sqlCommand.Parameters.Add("@book_id", SqlDbType.Int).Value = bookId;
+
+            await using var sqlDataReader = await sqlCommand.ExecuteReaderAsync();
+            while (await sqlDataReader.ReadAsync())
+            {
+                var book = new Book
+                {
+                    Id = Convert.ToInt32(sqlDataReader["id"]),
+                    ISBN = Convert.ToInt64(sqlDataReader["isbn"]),
+                    Title = Convert.ToString(sqlDataReader["title"]),
+                    Description = Convert.ToString(sqlDataReader["description"]),
+                    TotalPages = Convert.ToInt32(sqlDataReader["total_pages"]),
+                    PublishedDate = Convert.ToDateTime(sqlDataReader["published_date"]),
+                    PublisherId = Convert.ToInt32(sqlDataReader["publisher_id"])
+                };
+
+                books.Add(book);
+            }
+
+            return books;
+        }
+
     }
 }
