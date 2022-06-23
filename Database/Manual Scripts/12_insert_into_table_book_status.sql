@@ -10,7 +10,6 @@ BEGIN
     VALUES
     (1, N'Available');
 END;
-GO
 
 IF NOT EXISTS (SELECT * FROM [dbo].[book_status] WHERE id = 2)
 BEGIN
@@ -22,7 +21,6 @@ BEGIN
     VALUES
     (2, N'Borrowed');
 END;
-GO
 
 IF NOT EXISTS (SELECT * FROM [dbo].[book_status] WHERE id = 3)
 BEGIN
@@ -34,6 +32,5 @@ BEGIN
     VALUES
     (3, N'Lost');
 END;
-GO
 
 SET IDENTITY_INSERT [dbo].[book_status] OFF;

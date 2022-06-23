@@ -14,7 +14,6 @@ BEGIN
     VALUES
     (1, 1);
 END;
-GO
 
 IF NOT EXISTS
 (
@@ -32,7 +31,6 @@ BEGIN
     VALUES
     (2, 1);
 END;
-GO
 
 IF NOT EXISTS
 (
@@ -50,7 +48,6 @@ BEGIN
     VALUES
     (3, 1);
 END;
-GO
 
 IF NOT EXISTS
 (
@@ -68,7 +65,6 @@ BEGIN
     VALUES
     (4, 1);
 END;
-GO
 
 IF NOT EXISTS
 (
@@ -86,7 +82,6 @@ BEGIN
     VALUES
     (5, 2);
 END;
-GO
 
 IF NOT EXISTS
 (
@@ -104,7 +99,6 @@ BEGIN
     VALUES
     (6, 2);
 END;
-GO
 
 IF NOT EXISTS
 (
@@ -122,7 +116,6 @@ BEGIN
     VALUES
     (7, 2);
 END;
-GO
 
 IF NOT EXISTS
 (
@@ -140,7 +133,6 @@ BEGIN
     VALUES
     (8, 2);
 END;
-GO
 
 IF NOT EXISTS
 (
@@ -158,7 +150,6 @@ BEGIN
     VALUES
     (9, 2);
 END;
-GO
 
 IF NOT EXISTS
 (
@@ -176,7 +167,6 @@ BEGIN
     VALUES
     (10, 3);
 END;
-GO
 
 IF NOT EXISTS
 (
@@ -194,7 +184,6 @@ BEGIN
     VALUES
     (11, 3);
 END;
-GO
 
 IF NOT EXISTS
 (
@@ -212,7 +201,6 @@ BEGIN
     VALUES
     (12, 3);
 END;
-GO
 
 IF NOT EXISTS
 (
@@ -230,4 +218,3 @@ BEGIN
     VALUES
     (13, 4);
 END;
-GO
