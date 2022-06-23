@@ -19,7 +19,7 @@ namespace LibraryManagementSystem.Infrastructure.IntegrationTests.Implementation
         }
 
         /// <summary>
-        /// Get top {x} amount of <see cref="Book"/>s.
+        /// Get top {x} amount of books.
         /// </summary>
         [Theory]
         [MemberData(nameof(BookDalTestMemberData.TopBorrowedBooksData), MemberType = typeof(BookDalTestMemberData))]
@@ -57,7 +57,7 @@ namespace LibraryManagementSystem.Infrastructure.IntegrationTests.Implementation
         }
 
         /// <summary>
-        /// Get status (available, borrowed, lost) of <see cref="Book"/>s.
+        /// Get status (available, borrowed, lost) of a book.
         /// </summary>
         [Theory]
         [InlineData(1, 5, 0, 0)]
@@ -96,11 +96,11 @@ namespace LibraryManagementSystem.Infrastructure.IntegrationTests.Implementation
         }
 
         /// <summary>
-        /// Get top {x} amount of <see cref="Book"/>s.
+        /// Get top {x} borrows for a given time frame.
         /// </summary>
         [Theory]
         [MemberData(nameof(BookDalTestMemberData.TopBorrowersData), MemberType = typeof(BookDalTestMemberData))]
-        public async Task GetTopBorrowers(int numberOfTopBorrowers, List<string> topBorrowersData)
+        public async Task GetTopBorrowers(int numberOfTopBorrowers, int expectedNumberOfBorrowers, List<string> topBorrowersData, DateTime fromDate, DateTime toDate)
         {
             // Arrange
             List<TopBorrowerDetail> topBorrowers;
@@ -116,7 +116,7 @@ namespace LibraryManagementSystem.Infrastructure.IntegrationTests.Implementation
             // Act
             try
             {
-                topBorrowers = await BookDal.GetTopBorrowers(sqlCommand, numberOfTopBorrowers);
+                topBorrowers = await BookDal.GetTopBorrowers(sqlCommand, numberOfTopBorrowers, fromDate, toDate);
             }
             finally
             {
@@ -124,7 +124,7 @@ namespace LibraryManagementSystem.Infrastructure.IntegrationTests.Implementation
             }
 
             // Assert
-            Assert.Equal(numberOfTopBorrowers, topBorrowers.Count);
+            Assert.Equal(expectedNumberOfBorrowers, topBorrowers.Count);
             
             for (var i = 0; i < topBorrowersData.Count; i++)
             {

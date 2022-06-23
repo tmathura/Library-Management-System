@@ -5,6 +5,10 @@ using System.Data.SqlClient;
 
 namespace LibraryManagementSystem.Infrastructure.Implementations
 {
+    /// <summary>
+    /// Book data access logic.
+    /// </summary>
+    /// <seealso cref="IBookDal" />
     public class BookDal : IBookDal
     {
         private readonly string _connectionString;
@@ -13,6 +17,11 @@ namespace LibraryManagementSystem.Infrastructure.Implementations
             _connectionString = connectionString;
         }
 
+        /// <summary>
+        /// Get the top borrowed books.
+        /// </summary>
+        /// <param name="numberOfBooks">Number of top books to return.</param>
+        /// <returns>A list of <see cref="TopBookDetail"/>s.</returns>
         public async Task<List<TopBookDetail>> GetTopBorrowedBooks(int numberOfBooks)
         {
             List<TopBookDetail> books;
@@ -41,6 +50,12 @@ namespace LibraryManagementSystem.Infrastructure.Implementations
             return books;
         }
 
+        /// <summary>
+        /// Get the top borrowed books.
+        /// </summary>
+        /// <param name="sqlCommand">The SqlCommand to use when interacting with the database.</param>
+        /// <param name="numberOfBooks">Number of top books to return.</param>
+        /// <returns>A list of <see cref="TopBookDetail"/>s.</returns>
         public static async Task<List<TopBookDetail>> GetTopBorrowedBooks(SqlCommand sqlCommand, int numberOfBooks)
         {
             var books = new List<TopBookDetail>();
@@ -72,6 +87,11 @@ namespace LibraryManagementSystem.Infrastructure.Implementations
             return books;
         }
 
+        /// <summary>
+        /// Get the status of a book/>.
+        /// </summary>
+        /// <param name="bookId">Book id to get the status of.</param>
+        /// <returns>A books <see cref="BookStatus"/></returns>
         public async Task<BookStatus> GetBookStatus(int bookId)
         {
             BookStatus bookStatus;
@@ -100,6 +120,12 @@ namespace LibraryManagementSystem.Infrastructure.Implementations
             return bookStatus;
         }
 
+        /// <summary>
+        /// Get the status of a book/>.
+        /// </summary>
+        /// <param name="sqlCommand">The SqlCommand to use when interacting with the database.</param>
+        /// <param name="bookId">Book id to get the status of.</param>
+        /// <returns>A books <see cref="BookStatus"/></returns>
         public static async Task<BookStatus> GetBookStatus(SqlCommand sqlCommand, int bookId)
         {
             var bookStatus = new BookStatus();
@@ -121,7 +147,14 @@ namespace LibraryManagementSystem.Infrastructure.Implementations
             return bookStatus;
         }
 
-        public async Task<List<TopBorrowerDetail>> GetTopBorrowers(int numberOfBorrowers)
+        /// <summary>
+        /// Get the top borrowers.
+        /// </summary>
+        /// <param name="numberOfBorrowers">Number of top borrowers to return.</param>
+        /// <param name="fromDate">The from date to lookup top borrowers.</param>
+        /// <param name="toDate">The to date to lookup top borrowers.</param>
+        /// <returns>A list of <see cref="TopBorrowerDetail"/>s.</returns>
+        public async Task<List<TopBorrowerDetail>> GetTopBorrowers(int numberOfBorrowers, DateTime fromDate, DateTime toDate)
         {
             List<TopBorrowerDetail> borrowers;
 
@@ -133,7 +166,7 @@ namespace LibraryManagementSystem.Infrastructure.Implementations
 
             try
             {
-                borrowers = await GetTopBorrowers(sqlCommand, numberOfBorrowers);
+                borrowers = await GetTopBorrowers(sqlCommand, numberOfBorrowers, fromDate, toDate);
 
                 await sqlTransaction.CommitAsync();
             }
@@ -149,7 +182,15 @@ namespace LibraryManagementSystem.Infrastructure.Implementations
             return borrowers;
         }
 
-        public static async Task<List<TopBorrowerDetail>> GetTopBorrowers(SqlCommand sqlCommand, int numberOfBorrows)
+        /// <summary>
+        /// Get the top borrowers.
+        /// </summary>
+        /// <param name="sqlCommand">The SqlCommand to use when interacting with the database.</param>
+        /// <param name="numberOfBorrowers">Number of top borrowers to return.</param>
+        /// <param name="fromDate">The from date to lookup top borrowers.</param>
+        /// <param name="toDate">The to date to lookup top borrowers.</param>
+        /// <returns>A list of <see cref="TopBorrowerDetail"/>s.</returns>
+        public static async Task<List<TopBorrowerDetail>> GetTopBorrowers(SqlCommand sqlCommand, int numberOfBorrowers, DateTime fromDate, DateTime toDate)
         {
             var borrowers = new List<TopBorrowerDetail>();
 
@@ -157,7 +198,9 @@ namespace LibraryManagementSystem.Infrastructure.Implementations
             sqlCommand.CommandText = "[dbo].[top_borrowers_get]";
             sqlCommand.Parameters.Clear();
 
-            sqlCommand.Parameters.Add("@number_of_borrowers", SqlDbType.Int).Value = numberOfBorrows;
+            sqlCommand.Parameters.Add("@number_of_borrowers", SqlDbType.Int).Value = numberOfBorrowers;
+            sqlCommand.Parameters.Add("@from_date", SqlDbType.Date).Value = fromDate;
+            sqlCommand.Parameters.Add("@to_date", SqlDbType.Date).Value = toDate;
 
             await using var sqlDataReader = await sqlCommand.ExecuteReaderAsync();
             while (await sqlDataReader.ReadAsync())
