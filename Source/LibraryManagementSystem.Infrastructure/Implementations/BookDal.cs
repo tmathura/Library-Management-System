@@ -41,7 +41,7 @@ namespace LibraryManagementSystem.Infrastructure.Implementations
             return books;
         }
 
-        public async Task<List<TopBookDetail>> GetTopBorrowedBooks(SqlCommand sqlCommand, int numberOfBooks)
+        public static async Task<List<TopBookDetail>> GetTopBorrowedBooks(SqlCommand sqlCommand, int numberOfBooks)
         {
             var books = new List<TopBookDetail>();
 
@@ -70,6 +70,55 @@ namespace LibraryManagementSystem.Infrastructure.Implementations
             }
 
             return books;
+        }
+
+        public async Task<BookStatus> GetBookStatus(int bookId)
+        {
+            BookStatus bookStatus;
+
+            await using var sqlConnection = new SqlConnection(_connectionString);
+            await sqlConnection.OpenAsync();
+            var sqlCommand = sqlConnection.CreateCommand();
+            var sqlTransaction = sqlConnection.BeginTransaction();
+            sqlCommand.Transaction = sqlTransaction;
+
+            try
+            {
+                bookStatus = await GetBookStatus(sqlCommand, bookId);
+
+                await sqlTransaction.CommitAsync();
+            }
+            catch (Exception exception)
+            {
+                Console.WriteLine(exception);
+
+                await sqlTransaction.RollbackAsync();
+
+                throw;
+            }
+
+            return bookStatus;
+        }
+
+        public static async Task<BookStatus> GetBookStatus(SqlCommand sqlCommand, int bookId)
+        {
+            var bookStatus = new BookStatus();
+
+            sqlCommand.CommandType = CommandType.StoredProcedure;
+            sqlCommand.CommandText = "[dbo].[book_status_get]";
+            sqlCommand.Parameters.Clear();
+
+            sqlCommand.Parameters.Add("@book_id", SqlDbType.Int).Value = bookId;
+
+            await using var sqlDataReader = await sqlCommand.ExecuteReaderAsync();
+            while (await sqlDataReader.ReadAsync())
+            {
+                bookStatus.Available = Convert.ToInt32(sqlDataReader["available"]);
+                bookStatus.Borrowed = Convert.ToInt32(sqlDataReader["borrowed"]);
+                bookStatus.Lost = Convert.ToInt32(sqlDataReader["lost"]);
+            }
+
+            return bookStatus;
         }
 
     }
