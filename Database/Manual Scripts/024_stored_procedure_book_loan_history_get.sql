@@ -2,7 +2,14 @@ CREATE OR ALTER PROCEDURE [dbo].[book_loan_history_get]
 (@book_id INT)
 AS
 BEGIN
-    SELECT bcl.from_date,
+    SELECT b.id,
+           b.isbn,
+           b.title,
+           b.[description],
+           b.total_pages,
+           b.published_date,
+           b.publisher_id,
+           bcl.from_date,
            bcl.to_date,
            bcl.return_date,
            DATEDIFF(DAY, bcl.from_date, bcl.return_date) AS days_loaned

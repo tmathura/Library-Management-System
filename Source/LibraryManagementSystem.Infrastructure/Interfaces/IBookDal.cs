@@ -58,10 +58,10 @@ namespace LibraryManagementSystem.Infrastructure.Interfaces
         Task<Book> GetBookById(int bookId);
 
         /// <summary>
-        /// Get the loan history detail of a book.
+        /// Get the loan history of a book.
         /// </summary>
         /// <param name="bookId">Book id to get the loan history of.</param>
-        /// <returns>A list of <see cref="BookHistoryDetail"/>s.</returns>
-        Task<List<BookHistoryDetail>> GetBookHistoryDetail(int bookId);
+        /// <returns>A books <see cref="BookHistory"/></returns>
+        Task<BookHistory?> GetBookHistory(int bookId);
     }
 }

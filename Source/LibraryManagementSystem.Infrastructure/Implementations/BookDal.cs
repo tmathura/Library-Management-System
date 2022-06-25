@@ -458,13 +458,13 @@ namespace LibraryManagementSystem.Infrastructure.Implementations
         }
 
         /// <summary>
-        /// Get the loan history detail of a book.
+        /// Get the loan history of a book.
         /// </summary>
         /// <param name="bookId">Book id to get the loan history of.</param>
-        /// <returns>A list of <see cref="BookHistoryDetail"/>s.</returns>
-        public async Task<List<BookHistoryDetail>> GetBookHistoryDetail(int bookId)
+        /// <returns>A books <see cref="BookHistory"/></returns>
+        public async Task<BookHistory?> GetBookHistory(int bookId)
         {
-            List<BookHistoryDetail> bookHistoryDetails;
+            BookHistory? bookHistory;
 
             await using var sqlConnection = new SqlConnection(_connectionString);
             await sqlConnection.OpenAsync();
@@ -474,7 +474,7 @@ namespace LibraryManagementSystem.Infrastructure.Implementations
 
             try
             {
-                bookHistoryDetails = await GetBookHistoryDetail(sqlCommand, bookId);
+                bookHistory = await GetBookHistory(sqlCommand, bookId);
 
                 await sqlTransaction.CommitAsync();
             }
@@ -487,17 +487,18 @@ namespace LibraryManagementSystem.Infrastructure.Implementations
                 throw;
             }
 
-            return bookHistoryDetails;
+            return bookHistory;
         }
 
         /// <summary>
-        /// Get the loan history detail of a book.
+        /// Get the loan history of a book.
         /// </summary>
         /// <param name="sqlCommand">The SqlCommand to use when interacting with the database.</param>
         /// <param name="bookId">Book id to get the loan history of.</param>
-        /// <returns>A list of <see cref="BookHistoryDetail"/>s.</returns>
-        public static async Task<List<BookHistoryDetail>> GetBookHistoryDetail(SqlCommand sqlCommand, int bookId)
+        /// <returns>A books <see cref="BookHistory"/></returns>
+        public static async Task<BookHistory?> GetBookHistory(SqlCommand sqlCommand, int bookId)
         {
+            var bookHistory = new BookHistory();
             var bookHistoryDetails = new List<BookHistoryDetail>();
 
             sqlCommand.CommandType = CommandType.StoredProcedure;
@@ -509,6 +510,17 @@ namespace LibraryManagementSystem.Infrastructure.Implementations
             await using var sqlDataReader = await sqlCommand.ExecuteReaderAsync();
             while (await sqlDataReader.ReadAsync())
             {
+                if (bookHistory.Id == 0)
+                {
+                    bookHistory.Id = Convert.ToInt32(sqlDataReader["id"]);
+                    bookHistory.ISBN = Convert.ToInt64(sqlDataReader["isbn"]);
+                    bookHistory.Title = Convert.ToString(sqlDataReader["title"]);
+                    bookHistory.Description = Convert.ToString(sqlDataReader["description"]);
+                    bookHistory.TotalPages = Convert.ToInt32(sqlDataReader["total_pages"]);
+                    bookHistory.PublishedDate = Convert.ToDateTime(sqlDataReader["published_date"]);
+                    bookHistory.PublisherId = Convert.ToInt32(sqlDataReader["publisher_id"]);
+                }
+
                 var bookHistoryDetail = new BookHistoryDetail
                 {
                     FromDate = Convert.ToDateTime(sqlDataReader["from_date"]),
@@ -520,7 +532,14 @@ namespace LibraryManagementSystem.Infrastructure.Implementations
                 bookHistoryDetails.Add(bookHistoryDetail);
             }
 
-            return bookHistoryDetails;
+            if (bookHistory.Id == 0)
+            {
+                return null;
+            }
+
+            bookHistory.BookHistoryDetails = bookHistoryDetails;
+
+            return bookHistory;
         }
     }
 }

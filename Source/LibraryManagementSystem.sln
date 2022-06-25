@@ -5,9 +5,11 @@ VisualStudioVersion = 17.2.32602.215
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LibraryManagementSystem.Infrastructure", "LibraryManagementSystem.Infrastructure\LibraryManagementSystem.Infrastructure.csproj", "{5EBE95AD-A967-4B63-AE91-86B22EBABFD2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LibraryManagementSystem.Domain", "LibraryManagementSystem.Domain\LibraryManagementSystem.Domain.csproj", "{9F509E70-9747-460C-8114-597B6E2000C4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LibraryManagementSystem.Domain", "LibraryManagementSystem.Domain\LibraryManagementSystem.Domain.csproj", "{9F509E70-9747-460C-8114-597B6E2000C4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LibraryManagementSystem.Infrastructure.IntegrationTests", "LibraryManagementSystem.Infrastructure.IntegrationTests\LibraryManagementSystem.Infrastructure.IntegrationTests.csproj", "{74ACCD38-7317-4A12-8A65-C2109EB06885}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LibraryManagementSystem.Infrastructure.IntegrationTests", "LibraryManagementSystem.Infrastructure.IntegrationTests\LibraryManagementSystem.Infrastructure.IntegrationTests.csproj", "{74ACCD38-7317-4A12-8A65-C2109EB06885}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LibraryManagementSystem.Core", "LibraryManagementSystem.Core\LibraryManagementSystem.Core.csproj", "{0735D37E-0151-42CF-A61A-D6EF2DDB14C2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,6 +29,10 @@ Global
 		{74ACCD38-7317-4A12-8A65-C2109EB06885}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{74ACCD38-7317-4A12-8A65-C2109EB06885}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{74ACCD38-7317-4A12-8A65-C2109EB06885}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0735D37E-0151-42CF-A61A-D6EF2DDB14C2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0735D37E-0151-42CF-A61A-D6EF2DDB14C2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0735D37E-0151-42CF-A61A-D6EF2DDB14C2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0735D37E-0151-42CF-A61A-D6EF2DDB14C2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

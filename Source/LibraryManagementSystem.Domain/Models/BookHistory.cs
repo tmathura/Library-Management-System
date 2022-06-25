@@ -2,11 +2,6 @@
 {
     public class BookHistory : Book
     {
-        public BookHistory(List<BookHistoryDetail> bookHistoryDetails)
-        {
-            BookHistoryDetails = bookHistoryDetails;
-        }
-
-        public List<BookHistoryDetail> BookHistoryDetails { get; }
+        public List<BookHistoryDetail>? BookHistoryDetails { get; set; }
     }
 }

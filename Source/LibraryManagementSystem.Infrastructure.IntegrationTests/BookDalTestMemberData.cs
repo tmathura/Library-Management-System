@@ -37,6 +37,14 @@
         {
             yield return new object?[]
             {
+                5,
+                new List<DateTime>(),
+                new List<DateTime>(),
+                new List<DateTime>(),
+                new List<int>()
+            };
+            yield return new object?[]
+            {
                 13,
                 new List<DateTime> { new(2022, 04, 01), new(2022, 05, 15), new(2022, 05, 15), new(2022, 06, 15) },
                 new List<DateTime> { new(2022, 04, 14), new(2022, 05, 28), new(2022, 05, 28), new(2022, 06, 28) },
