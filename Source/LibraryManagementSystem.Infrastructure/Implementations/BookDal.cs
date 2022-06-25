@@ -520,13 +520,14 @@ namespace LibraryManagementSystem.Infrastructure.Implementations
                     bookHistory.PublishedDate = Convert.ToDateTime(sqlDataReader["published_date"]);
                     bookHistory.PublisherId = Convert.ToInt32(sqlDataReader["publisher_id"]);
                 }
-
+                
                 var bookHistoryDetail = new BookHistoryDetail
                 {
                     FromDate = Convert.ToDateTime(sqlDataReader["from_date"]),
                     ToDate = Convert.ToDateTime(sqlDataReader["to_date"]),
                     ReturnDate = Convert.ToDateTime(sqlDataReader["return_date"]),
-                    DaysLoaned = Convert.ToInt32(sqlDataReader["days_loaned"])
+                    DaysLoaned = Convert.ToInt32(sqlDataReader["days_loaned"]),
+                    AveragePageReadRate = (int)Math.Round(bookHistory.TotalPages / Convert.ToDecimal(sqlDataReader["days_loaned"]))
                 };
 
                 bookHistoryDetails.Add(bookHistoryDetail);

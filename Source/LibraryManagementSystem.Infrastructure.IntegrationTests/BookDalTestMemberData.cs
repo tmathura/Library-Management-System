@@ -41,6 +41,7 @@
                 new List<DateTime>(),
                 new List<DateTime>(),
                 new List<DateTime>(),
+                new List<int>(),
                 new List<int>()
             };
             yield return new object?[]
@@ -49,7 +50,8 @@
                 new List<DateTime> { new(2022, 04, 01), new(2022, 05, 15), new(2022, 05, 15), new(2022, 06, 15) },
                 new List<DateTime> { new(2022, 04, 14), new(2022, 05, 28), new(2022, 05, 28), new(2022, 06, 28) },
                 new List<DateTime> { new(2022, 04, 14), new(2022, 05, 22), new(2022, 05, 28), new(2022, 06, 25) },
-                new List<int> { 13, 7, 13, 10 }
+                new List<int> { 13, 7, 13, 10 },
+                new List<int> { 38, 71, 38, 50 }
             };
         }
     }

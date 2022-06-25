@@ -251,7 +251,7 @@ namespace LibraryManagementSystem.Infrastructure.IntegrationTests.Implementation
         /// </summary>
         [Theory]
         [MemberData(nameof(BookDalTestMemberData.GetBookHistoryDetailData), MemberType = typeof(BookDalTestMemberData))]
-        public async Task GetBookHistoryDetail(int bookId, List<DateTime> bookHistoryDetailFromDate, List<DateTime> bookHistoryDetailToDate, List<DateTime> bookHistoryDetailReturnDate, List<int> bookHistoryDetailDaysLoaned)
+        public async Task GetBookHistoryDetail(int bookId, List<DateTime> bookHistoryDetailFromDate, List<DateTime> bookHistoryDetailToDate, List<DateTime> bookHistoryDetailReturnDate, List<int> bookHistoryDetailDaysLoaned, List<int> bookHistoryDetailAveragePageReadRate)
         {
             // Arrange
             BookHistory? bookHistory;
@@ -285,10 +285,11 @@ namespace LibraryManagementSystem.Infrastructure.IntegrationTests.Implementation
 
                 for (var i = 0; i < bookHistory?.BookHistoryDetails!.Count; i++)
                 {
-                    Assert.Equal(bookHistoryDetailFromDate[i], bookHistory.BookHistoryDetails[i].FromDate);
+                    Assert.Equal(bookHistoryDetailFromDate[i], bookHistory!.BookHistoryDetails![i].FromDate);
                     Assert.Equal(bookHistoryDetailToDate[i], bookHistory.BookHistoryDetails[i].ToDate);
                     Assert.Equal(bookHistoryDetailReturnDate[i], bookHistory.BookHistoryDetails[i].ReturnDate);
                     Assert.Equal(bookHistoryDetailDaysLoaned[i], bookHistory.BookHistoryDetails[i].DaysLoaned);
+                    Assert.Equal(bookHistoryDetailAveragePageReadRate[i], bookHistory.BookHistoryDetails[i].AveragePageReadRate);
                     _outputHelper.WriteLine($"Book '{bookHistory.Title}' was loaned for {bookHistory.BookHistoryDetails[i].DaysLoaned} day/s from {bookHistory.BookHistoryDetails[i].FromDate} to {bookHistory.BookHistoryDetails[i].ToDate} and returned on {bookHistory.BookHistoryDetails[i].ReturnDate}.");
                 }
             }
