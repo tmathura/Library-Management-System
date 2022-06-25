@@ -2,6 +2,6 @@
 {
     public class Settings
     {
-        public Database Database { get; set; }
+        public Database Database { get; set; } = null!;
     }
 }

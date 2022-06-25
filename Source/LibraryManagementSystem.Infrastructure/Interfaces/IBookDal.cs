@@ -43,5 +43,25 @@ namespace LibraryManagementSystem.Infrastructure.Interfaces
         /// <param name="bookId">Borrow id to lookup.</param>
         /// <returns>A list of <see cref="Book"/>s.</returns>
         Task<List<Book>> GetOtherBooksLoanedByBorrowersOfASpecificBook(int bookId);
+
+        /// <summary>
+        /// Get all books.
+        /// </summary>
+        /// <returns><see cref="Book"/>s</returns>
+        Task<List<Book>> GetAllBooks();
+
+        /// <summary>
+        /// Get book by id.
+        /// </summary>
+        /// <param name="bookId">Id of book to lookup.</param>
+        /// <returns><see cref="Book"/></returns>
+        Task<Book> GetBookById(int bookId);
+
+        /// <summary>
+        /// Get the loan history detail of a book.
+        /// </summary>
+        /// <param name="bookId">Book id to get the loan history of.</param>
+        /// <returns>A list of <see cref="BookHistoryDetail"/>s.</returns>
+        Task<List<BookHistoryDetail>> GetBookHistoryDetail(int bookId);
     }
 }

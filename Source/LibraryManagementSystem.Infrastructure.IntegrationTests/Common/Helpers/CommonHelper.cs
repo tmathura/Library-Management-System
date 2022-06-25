@@ -26,7 +26,7 @@ namespace LibraryManagementSystem.Infrastructure.IntegrationTests.Common.Helpers
 
             while (sourceDirectory != "Source")
             {
-                currentParentDirectory = Directory.GetParent(currentParentDirectory?.FullName);
+                currentParentDirectory = Directory.GetParent(currentParentDirectory?.FullName!);
                 sourceDirectory = currentParentDirectory?.Name;
 
                 if (sourceDirectory == "Source")

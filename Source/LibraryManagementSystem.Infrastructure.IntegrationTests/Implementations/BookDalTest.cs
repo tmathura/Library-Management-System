@@ -125,7 +125,7 @@ namespace LibraryManagementSystem.Infrastructure.IntegrationTests.Implementation
 
             // Assert
             Assert.Equal(expectedNumberOfBorrowers, topBorrowers.Count);
-            
+
             for (var i = 0; i < topBorrowers.Count; i++)
             {
                 Assert.Equal(topBorrowersData[i], topBorrowers[i].Id);
@@ -205,6 +205,85 @@ namespace LibraryManagementSystem.Infrastructure.IntegrationTests.Implementation
             {
                 Assert.Equal(otherBorrowedBooksData[i], books[i].Id);
                 _outputHelper.WriteLine($"One of the other books are: {books[i].Title}.");
+            }
+        }
+
+        /// <summary>
+        /// Test the books get and check that it is equal to the member data.
+        /// </summary>
+        [Theory]
+        [MemberData(nameof(BookDalTestMemberData.GetBooksData), MemberType = typeof(BookDalTestMemberData))]
+        public async Task GetBooks(int? bookId, List<int> booksReturned)
+        {
+            // Arrange
+            List<Book> books;
+
+            await using var sqlConnection = new SqlConnection(_commonHelper.Settings.Database.ConnectionString);
+            await sqlConnection.OpenAsync();
+            var sqlCommand = sqlConnection.CreateCommand();
+            var sqlTransaction = sqlConnection.BeginTransaction();
+            sqlCommand.Transaction = sqlTransaction;
+
+            await CommonHelper.AddTestDataToDatabase(sqlCommand);
+
+            // Act
+            try
+            {
+                books = await BookDal.GetBooks(sqlCommand, bookId);
+            }
+            finally
+            {
+                await sqlTransaction.RollbackAsync();
+            }
+
+            // Assert
+            Assert.Equal(booksReturned.Count, books.Count);
+
+            for (var i = 0; i < books.Count; i++)
+            {
+                Assert.Equal(booksReturned[i], books[i].Id);
+                _outputHelper.WriteLine($"There is a book called: {books[i].Title}.");
+            }
+        }
+
+        /// <summary>
+        /// Test a book loan history detail is equal to the member data.
+        /// </summary>
+        [Theory]
+        [MemberData(nameof(BookDalTestMemberData.GetBookHistoryDetailData), MemberType = typeof(BookDalTestMemberData))]
+        public async Task GetBookHistoryDetail(int bookId, List<DateTime> bookHistoryDetailFromDate, List<DateTime> bookHistoryDetailToDate, List<DateTime> bookHistoryDetailReturnDate, List<int> bookHistoryDetailDaysLoaned)
+        {
+            // Arrange
+            List<BookHistoryDetail> bookHistoryDetails;
+
+            await using var sqlConnection = new SqlConnection(_commonHelper.Settings.Database.ConnectionString);
+            await sqlConnection.OpenAsync();
+            var sqlCommand = sqlConnection.CreateCommand();
+            var sqlTransaction = sqlConnection.BeginTransaction();
+            sqlCommand.Transaction = sqlTransaction;
+
+            await CommonHelper.AddTestDataToDatabase(sqlCommand);
+
+            // Act
+            try
+            {
+                bookHistoryDetails = await BookDal.GetBookHistoryDetail(sqlCommand, bookId);
+            }
+            finally
+            {
+                await sqlTransaction.RollbackAsync();
+            }
+
+            // Assert
+            Assert.Equal(bookHistoryDetailFromDate.Count, bookHistoryDetails.Count);
+
+            for (var i = 0; i < bookHistoryDetails.Count; i++)
+            {
+                Assert.Equal(bookHistoryDetailFromDate[i], bookHistoryDetails[i].FromDate);
+                Assert.Equal(bookHistoryDetailToDate[i], bookHistoryDetails[i].ToDate);
+                Assert.Equal(bookHistoryDetailReturnDate[i], bookHistoryDetails[i].ReturnDate);
+                Assert.Equal(bookHistoryDetailDaysLoaned[i], bookHistoryDetails[i].DaysLoaned);
+                _outputHelper.WriteLine($"Book called: {bookId} was loaned for {bookHistoryDetails[i].DaysLoaned} day/s from {bookHistoryDetails[i].FromDate} to {bookHistoryDetails[i].ToDate} and returned on {bookHistoryDetails[i].ReturnDate}.");
             }
         }
     }

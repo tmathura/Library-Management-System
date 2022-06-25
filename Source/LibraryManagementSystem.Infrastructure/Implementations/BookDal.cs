@@ -1,4 +1,5 @@
 ﻿using LibraryManagementSystem.Domain.Models;
+using LibraryManagementSystem.Infrastructure.Extensions;
 using LibraryManagementSystem.Infrastructure.Interfaces;
 using System.Data;
 using System.Data.SqlClient;
@@ -355,5 +356,171 @@ namespace LibraryManagementSystem.Infrastructure.Implementations
             return books;
         }
 
+        /// <summary>
+        /// Get all books.
+        /// </summary>
+        /// <returns>A list of <see cref="Book"/>s.</returns>
+        public async Task<List<Book>> GetAllBooks()
+        {
+            List<Book> books;
+
+            await using var sqlConnection = new SqlConnection(_connectionString);
+            await sqlConnection.OpenAsync();
+            var sqlCommand = sqlConnection.CreateCommand();
+            var sqlTransaction = sqlConnection.BeginTransaction();
+            sqlCommand.Transaction = sqlTransaction;
+
+            try
+            {
+                books = await GetBooks(sqlCommand, null);
+
+                await sqlTransaction.CommitAsync();
+            }
+            catch (Exception exception)
+            {
+                Console.WriteLine(exception);
+
+                await sqlTransaction.RollbackAsync();
+                throw;
+            }
+
+            return books;
+        }
+
+        /// <summary>
+        /// Get book by id.
+        /// </summary>
+        /// <param name="bookId">Id of book to lookup.</param>
+        /// <returns><see cref="Book"/></returns>
+        public async Task<Book> GetBookById(int bookId)
+        {
+            Book book;
+
+            await using var sqlConnection = new SqlConnection(_connectionString);
+            await sqlConnection.OpenAsync();
+            var sqlCommand = sqlConnection.CreateCommand();
+            var sqlTransaction = sqlConnection.BeginTransaction();
+            sqlCommand.Transaction = sqlTransaction;
+
+            try
+            {
+
+                var books = await GetBooks(sqlCommand, bookId);
+                book = books.FirstOrDefault()!;
+
+                await sqlTransaction.CommitAsync();
+            }
+            catch (Exception exception)
+            {
+                Console.WriteLine(exception);
+
+                await sqlTransaction.RollbackAsync();
+                throw;
+            }
+
+            return book;
+        }
+
+        /// <summary>
+        /// Get books.
+        /// </summary>
+        /// <param name="sqlCommand">The SqlCommand to use when interacting with the database.</param>
+        /// <param name="bookId">Id of book to lookup.</param>
+        /// <returns>A list of <see cref="Book"/>s.</returns>
+        public static async Task<List<Book>> GetBooks(SqlCommand sqlCommand, int? bookId)
+        {
+            var books = new List<Book>();
+
+            sqlCommand.CommandType = CommandType.StoredProcedure;
+            sqlCommand.CommandText = "[dbo].[books_get]";
+            sqlCommand.Parameters.Clear();
+
+            sqlCommand.Parameters.Add("@book_id", SqlDbType.Int).Value = bookId.ToSqlNull();
+
+            await using var sqlDataReader = await sqlCommand.ExecuteReaderAsync();
+            while (await sqlDataReader.ReadAsync())
+            {
+                var book = new Book
+                {
+                    Id = Convert.ToInt32(sqlDataReader["id"]),
+                    ISBN = Convert.ToInt64(sqlDataReader["isbn"]),
+                    Title = Convert.ToString(sqlDataReader["title"]),
+                    Description = Convert.ToString(sqlDataReader["description"]),
+                    TotalPages = Convert.ToInt32(sqlDataReader["total_pages"]),
+                    PublishedDate = Convert.ToDateTime(sqlDataReader["published_date"]),
+                    PublisherId = Convert.ToInt32(sqlDataReader["publisher_id"])
+                };
+
+                books.Add(book);
+            }
+
+            return books;
+        }
+
+        /// <summary>
+        /// Get the loan history detail of a book.
+        /// </summary>
+        /// <param name="bookId">Book id to get the loan history of.</param>
+        /// <returns>A list of <see cref="BookHistoryDetail"/>s.</returns>
+        public async Task<List<BookHistoryDetail>> GetBookHistoryDetail(int bookId)
+        {
+            List<BookHistoryDetail> bookHistoryDetails;
+
+            await using var sqlConnection = new SqlConnection(_connectionString);
+            await sqlConnection.OpenAsync();
+            var sqlCommand = sqlConnection.CreateCommand();
+            var sqlTransaction = sqlConnection.BeginTransaction();
+            sqlCommand.Transaction = sqlTransaction;
+
+            try
+            {
+                bookHistoryDetails = await GetBookHistoryDetail(sqlCommand, bookId);
+
+                await sqlTransaction.CommitAsync();
+            }
+            catch (Exception exception)
+            {
+                Console.WriteLine(exception);
+
+                await sqlTransaction.RollbackAsync();
+
+                throw;
+            }
+
+            return bookHistoryDetails;
+        }
+
+        /// <summary>
+        /// Get the loan history detail of a book.
+        /// </summary>
+        /// <param name="sqlCommand">The SqlCommand to use when interacting with the database.</param>
+        /// <param name="bookId">Book id to get the loan history of.</param>
+        /// <returns>A list of <see cref="BookHistoryDetail"/>s.</returns>
+        public static async Task<List<BookHistoryDetail>> GetBookHistoryDetail(SqlCommand sqlCommand, int bookId)
+        {
+            var bookHistoryDetails = new List<BookHistoryDetail>();
+
+            sqlCommand.CommandType = CommandType.StoredProcedure;
+            sqlCommand.CommandText = "[dbo].[book_loan_history_get]";
+            sqlCommand.Parameters.Clear();
+
+            sqlCommand.Parameters.Add("@book_id", SqlDbType.Int).Value = bookId;
+
+            await using var sqlDataReader = await sqlCommand.ExecuteReaderAsync();
+            while (await sqlDataReader.ReadAsync())
+            {
+                var bookHistoryDetail = new BookHistoryDetail
+                {
+                    FromDate = Convert.ToDateTime(sqlDataReader["from_date"]),
+                    ToDate = Convert.ToDateTime(sqlDataReader["to_date"]),
+                    ReturnDate = Convert.ToDateTime(sqlDataReader["return_date"]),
+                    DaysLoaned = Convert.ToInt32(sqlDataReader["days_loaned"])
+                };
+
+                bookHistoryDetails.Add(bookHistoryDetail);
+            }
+
+            return bookHistoryDetails;
+        }
     }
 }

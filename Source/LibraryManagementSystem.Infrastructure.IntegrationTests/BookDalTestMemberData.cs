@@ -26,5 +26,23 @@
         {
             yield return new object[] { 13, 5, new List<int> { 1, 2, 3, 4, 13 } };
         }
+
+        public static IEnumerable<object?[]> GetBooksData()
+        {
+            yield return new object?[] { 13, new List<int> { 13 } };
+            yield return new object?[] { null, new List<int> { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13 } };
+        }
+
+        public static IEnumerable<object?[]> GetBookHistoryDetailData()
+        {
+            yield return new object?[]
+            {
+                13,
+                new List<DateTime> { new(2022, 04, 01), new(2022, 05, 15), new(2022, 05, 15), new(2022, 06, 15) },
+                new List<DateTime> { new(2022, 04, 14), new(2022, 05, 28), new(2022, 05, 28), new(2022, 06, 28) },
+                new List<DateTime> { new(2022, 04, 14), new(2022, 05, 22), new(2022, 05, 28), new(2022, 06, 25) },
+                new List<int> { 13, 7, 13, 10 }
+            };
+        }
     }
 }
