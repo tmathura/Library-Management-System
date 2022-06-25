@@ -6,7 +6,5 @@
         public DateTime ToDate { get; set; }
         public DateTime ReturnDate { get; set; }
         public int DaysLoaned { get; set; }
-        public int AveragePageReadRate { get; set; }
-
     }
 }

@@ -19,7 +19,7 @@ namespace LibraryManagementSystem.Infrastructure.IntegrationTests.Implementation
         }
 
         /// <summary>
-        /// Test the top {x} amount of books is equal to the member data.
+        /// Test the top {x} amount of books is equal to the expected member data.
         /// </summary>
         [Theory]
         [MemberData(nameof(BookDalTestMemberData.TopBorrowedBooksData), MemberType = typeof(BookDalTestMemberData))]
@@ -57,7 +57,7 @@ namespace LibraryManagementSystem.Infrastructure.IntegrationTests.Implementation
         }
 
         /// <summary>
-        /// Verify the status (available, borrowed, lost) of a book is equal to the member data.
+        /// Verify the status (available, borrowed, lost) of a book is equal to the expected member data.
         /// </summary>
         [Theory]
         [InlineData(1, 5, 0, 0)]
@@ -96,7 +96,7 @@ namespace LibraryManagementSystem.Infrastructure.IntegrationTests.Implementation
         }
 
         /// <summary>
-        /// Test the top {x} borrows for a given time frame is equal to the member data.
+        /// Test the top {x} borrows for a given time frame is equal to the expected member data.
         /// </summary>
         [Theory]
         [MemberData(nameof(BookDalTestMemberData.TopBorrowersData), MemberType = typeof(BookDalTestMemberData))]
@@ -134,7 +134,7 @@ namespace LibraryManagementSystem.Infrastructure.IntegrationTests.Implementation
         }
 
         /// <summary>
-        /// Test the borrowers borrowed book count for each time frame is equal to what is in the member data.
+        /// Test the borrowers borrowed book count for each time frame is equal to what is in the expected member data.
         /// </summary>
         [Theory]
         [MemberData(nameof(BookDalTestMemberData.BorrowerBorrowedTimeFrameCountData), MemberType = typeof(BookDalTestMemberData))]
@@ -171,7 +171,7 @@ namespace LibraryManagementSystem.Infrastructure.IntegrationTests.Implementation
         }
 
         /// <summary>
-        /// Test that the other books loaned by borrowers of a specific book matched the member data.
+        /// Test that the other books loaned by borrowers of a specific book matched the expected member data.
         /// </summary>
         [Theory]
         [MemberData(nameof(BookDalTestMemberData.OtherBorrowedBooksData), MemberType = typeof(BookDalTestMemberData))]
@@ -209,7 +209,7 @@ namespace LibraryManagementSystem.Infrastructure.IntegrationTests.Implementation
         }
 
         /// <summary>
-        /// Test the books get and check that it is equal to the member data.
+        /// Test the books get and check that it is equal to the expected member data.
         /// </summary>
         [Theory]
         [MemberData(nameof(BookDalTestMemberData.GetBooksData), MemberType = typeof(BookDalTestMemberData))]
@@ -247,11 +247,11 @@ namespace LibraryManagementSystem.Infrastructure.IntegrationTests.Implementation
         }
 
         /// <summary>
-        /// Test a book loan history is equal to the member data.
+        /// Test a book loan history is equal to the expected member data.
         /// </summary>
         [Theory]
         [MemberData(nameof(BookDalTestMemberData.GetBookHistoryDetailData), MemberType = typeof(BookDalTestMemberData))]
-        public async Task GetBookHistoryDetail(int bookId, List<DateTime> bookHistoryDetailFromDate, List<DateTime> bookHistoryDetailToDate, List<DateTime> bookHistoryDetailReturnDate, List<int> bookHistoryDetailDaysLoaned, List<int> bookHistoryDetailAveragePageReadRate)
+        public async Task GetBookHistoryDetail(int bookId, List<DateTime> bookHistoryDetailFromDate, List<DateTime> bookHistoryDetailToDate, List<DateTime> bookHistoryDetailReturnDate, List<int> bookHistoryDetailDaysLoaned)
         {
             // Arrange
             BookHistory? bookHistory;
@@ -289,7 +289,6 @@ namespace LibraryManagementSystem.Infrastructure.IntegrationTests.Implementation
                     Assert.Equal(bookHistoryDetailToDate[i], bookHistory.BookHistoryDetails[i].ToDate);
                     Assert.Equal(bookHistoryDetailReturnDate[i], bookHistory.BookHistoryDetails[i].ReturnDate);
                     Assert.Equal(bookHistoryDetailDaysLoaned[i], bookHistory.BookHistoryDetails[i].DaysLoaned);
-                    Assert.Equal(bookHistoryDetailAveragePageReadRate[i], bookHistory.BookHistoryDetails[i].AveragePageReadRate);
                     _outputHelper.WriteLine($"Book '{bookHistory.Title}' was loaned for {bookHistory.BookHistoryDetails[i].DaysLoaned} day/s from {bookHistory.BookHistoryDetails[i].FromDate} to {bookHistory.BookHistoryDetails[i].ToDate} and returned on {bookHistory.BookHistoryDetails[i].ReturnDate}.");
                 }
             }

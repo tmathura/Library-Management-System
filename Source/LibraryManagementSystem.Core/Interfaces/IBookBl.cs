@@ -60,4 +60,11 @@ public interface IBookBl
     /// <param name="bookId">Id of book to lookup.</param>
     /// <returns><see cref="Book"/></returns>
     Task<BookHistory?> GetBookHistory(int bookId);
+
+    /// <summary>
+    /// Get a book average read rate.
+    /// </summary>
+    /// <param name="bookId">Id of book to lookup.</param>
+    /// <returns><see cref="Book"/></returns>
+    Task<int> GetBookAverageReadRate(int bookId);
 }

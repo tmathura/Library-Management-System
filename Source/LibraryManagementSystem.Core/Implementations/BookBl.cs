@@ -185,5 +185,34 @@ namespace LibraryManagementSystem.Core.Implementations
                 throw;
             }
         }
+
+        /// <summary>
+        /// Get a book average read rate.
+        /// </summary>
+        /// <param name="bookId">Id of book to lookup.</param>
+        /// <returns><see cref="Book"/></returns>
+        public async Task<int> GetBookAverageReadRate(int bookId)
+        {
+            try
+            {
+                var bookHistory = await _bookDal.GetBookHistory(bookId);
+
+                if (bookHistory == null)
+                {
+                    return 0;
+                }
+
+                var averagePageReadRatePerPeriod = bookHistory.BookHistoryDetails!.Select(x => (int)Math.Round(bookHistory.TotalPages / (double)x.DaysLoaned, MidpointRounding.AwayFromZero)).ToList();
+                var averageReadRate = (int)Math.Round((double)averagePageReadRatePerPeriod.Sum() / bookHistory.BookHistoryDetails!.Count, MidpointRounding.AwayFromZero);
+
+                return averageReadRate;
+            }
+            catch (Exception exception)
+            {
+                Console.WriteLine(exception);
+
+                throw;
+            }
+        }
     }
 }

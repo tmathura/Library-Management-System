@@ -527,7 +527,6 @@ namespace LibraryManagementSystem.Infrastructure.Implementations
                     ToDate = Convert.ToDateTime(sqlDataReader["to_date"]),
                     ReturnDate = Convert.ToDateTime(sqlDataReader["return_date"]),
                     DaysLoaned = Convert.ToInt32(sqlDataReader["days_loaned"]),
-                    AveragePageReadRate = (int)Math.Round(bookHistory.TotalPages / Convert.ToDecimal(sqlDataReader["days_loaned"]))
                 };
 
                 bookHistoryDetails.Add(bookHistoryDetail);
