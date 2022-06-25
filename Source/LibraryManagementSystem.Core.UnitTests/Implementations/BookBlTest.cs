@@ -13,6 +13,7 @@ namespace LibraryManagementSystem.Core.UnitTests.Implementations
         public BookBlTest()
         {
             _mockIBookDal = new Mock<IBookDal>();
+            _bookBl = new BookBl(_mockIBookDal.Object);
         }
 
         /// <summary>
