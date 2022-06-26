@@ -3,9 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.2.32602.215
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StarterTreats.SimpleTasks", "StarterTreats.SimpleTasks\StarterTreats.SimpleTasks.csproj", "{C9787D89-91F5-4689-B90D-488E540A293D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StarterTreats.SimpleTasks", "StarterTreats.SimpleTasks\StarterTreats.SimpleTasks.csproj", "{C9787D89-91F5-4689-B90D-488E540A293D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StarterTreats.SimpleTasks.UnitTests", "StarterTreats.SimpleTasks.UnitTests\StarterTreats.SimpleTasks.UnitTests.csproj", "{381C4AA6-5FD3-4119-9B60-A032CBBD1474}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StarterTreats.SimpleTasks.UnitTests", "StarterTreats.SimpleTasks.UnitTests\StarterTreats.SimpleTasks.UnitTests.csproj", "{381C4AA6-5FD3-4119-9B60-A032CBBD1474}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StarterTreats.Console", "StarterTreats.Console\StarterTreats.Console.csproj", "{75A29C41-22DA-4E06-A273-EC71AE9CB152}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{381C4AA6-5FD3-4119-9B60-A032CBBD1474}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{381C4AA6-5FD3-4119-9B60-A032CBBD1474}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{381C4AA6-5FD3-4119-9B60-A032CBBD1474}.Release|Any CPU.Build.0 = Release|Any CPU
+		{75A29C41-22DA-4E06-A273-EC71AE9CB152}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{75A29C41-22DA-4E06-A273-EC71AE9CB152}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{75A29C41-22DA-4E06-A273-EC71AE9CB152}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{75A29C41-22DA-4E06-A273-EC71AE9CB152}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
