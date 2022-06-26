@@ -3,6 +3,7 @@ using LibraryManagementSystem.Core.Interfaces;
 using LibraryManagementSystem.GrpcServer.Services;
 using LibraryManagementSystem.Infrastructure.Implementations;
 using LibraryManagementSystem.Infrastructure.Interfaces;
+using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,6 +14,10 @@ builder.Services.AddSingleton<IBookDal, BookDal>(_ => new BookDal(configuration.
 builder.Services.AddSingleton<IBookBl, BookBl>();
 
 builder.Services.AddGrpc();
+
+var repository = log4net.LogManager.GetRepository(Assembly.GetEntryAssembly());
+var fileInfo = new FileInfo(@"log4net.config");
+log4net.Config.XmlConfigurator.Configure(repository, fileInfo);
 
 var app = builder.Build();
 
