@@ -1,7 +1,6 @@
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
 using LibraryManagementSystem.GrpcServer.IntegrationTests.Common.Helpers;
-using System.Data.SqlClient;
 using Xunit.Abstractions;
 
 namespace LibraryManagementSystem.GrpcServer.IntegrationTests.Services
@@ -28,30 +27,13 @@ namespace LibraryManagementSystem.GrpcServer.IntegrationTests.Services
             // Arrange
             var getTopBorrowedBooksResponses = new List<GetTopBorrowedBooksResponse>();
 
-            await using var sqlConnection = new SqlConnection(_commonHelper.Settings.Database.ConnectionString);
-            await sqlConnection.OpenAsync();
-            var sqlCommand = sqlConnection.CreateCommand();
-            var sqlTransaction = sqlConnection.BeginTransaction();
-            sqlCommand.Transaction = sqlTransaction;
-
-            await CommonHelper.AddTestDataToDatabase(sqlCommand);
-
             // Act
-            try
+            var getTopBorrowedBooksRequest = new GetTopBorrowedBooksRequest { NumberOfBooks = numberOfTopBooks };
+            using var call = _commonHelper.BooksClient.GetTopBorrowedBooks(getTopBorrowedBooksRequest);
+            while (await call.ResponseStream.MoveNext())
             {
-                var getTopBorrowedBooksRequest = new GetTopBorrowedBooksRequest { NumberOfBooks = numberOfTopBooks };
-                using (var call = _commonHelper.BooksClient.GetTopBorrowedBooks(getTopBorrowedBooksRequest))
-                {
-                    while (await call.ResponseStream.MoveNext())
-                    {
-                        var current = call.ResponseStream.Current;
-                        getTopBorrowedBooksResponses.Add(current);
-                    }
-                }
-            }
-            finally
-            {
-                await sqlTransaction.RollbackAsync();
+                var current = call.ResponseStream.Current;
+                getTopBorrowedBooksResponses.Add(current);
             }
 
             // Assert
@@ -74,27 +56,9 @@ namespace LibraryManagementSystem.GrpcServer.IntegrationTests.Services
         [InlineData(13, 4, 1, 0)]
         public async Task GetBookStatus(int bookId, int numberAvailable, int numberBorrowed, int numberLost)
         {
-            // Arrange
-            GetBookStatusResponse getBookStatusResponse;
-
-            await using var sqlConnection = new SqlConnection(_commonHelper.Settings.Database.ConnectionString);
-            await sqlConnection.OpenAsync();
-            var sqlCommand = sqlConnection.CreateCommand();
-            var sqlTransaction = sqlConnection.BeginTransaction();
-            sqlCommand.Transaction = sqlTransaction;
-
-            await CommonHelper.AddTestDataToDatabase(sqlCommand);
-
             // Act
-            try
-            {
-                var getBookStatusRequest = new GetBookStatusRequest { BookId = bookId };
-                getBookStatusResponse = await _commonHelper.BooksClient.GetBookStatusAsync(getBookStatusRequest);
-            }
-            finally
-            {
-                await sqlTransaction.RollbackAsync();
-            }
+            var getBookStatusRequest = new GetBookStatusRequest { BookId = bookId };
+            var getBookStatusResponse = await _commonHelper.BooksClient.GetBookStatusAsync(getBookStatusRequest);
 
             // Assert
             Assert.NotNull(getBookStatusResponse.Result);
@@ -118,30 +82,13 @@ namespace LibraryManagementSystem.GrpcServer.IntegrationTests.Services
             // Arrange
             var getTopBorrowersResponses = new List<GetTopBorrowersResponse>();
 
-            await using var sqlConnection = new SqlConnection(_commonHelper.Settings.Database.ConnectionString);
-            await sqlConnection.OpenAsync();
-            var sqlCommand = sqlConnection.CreateCommand();
-            var sqlTransaction = sqlConnection.BeginTransaction();
-            sqlCommand.Transaction = sqlTransaction;
-
-            await CommonHelper.AddTestDataToDatabase(sqlCommand);
-
             // Act
-            try
+            var getTopBorrowersRequest = new GetTopBorrowersRequest { NumberOfBorrowers = numberOfTopBorrowers, FromDate = Timestamp.FromDateTime(DateTime.SpecifyKind(fromDate, DateTimeKind.Utc)), ToDate = Timestamp.FromDateTime(DateTime.SpecifyKind(toDate, DateTimeKind.Utc)) };
+            using var call = _commonHelper.BooksClient.GetTopBorrowers(getTopBorrowersRequest);
+            while (await call.ResponseStream.MoveNext())
             {
-                var getTopBorrowersRequest = new GetTopBorrowersRequest { NumberOfBorrowers = numberOfTopBorrowers, FromDate = Timestamp.FromDateTime(DateTime.SpecifyKind(fromDate, DateTimeKind.Utc)), ToDate = Timestamp.FromDateTime(DateTime.SpecifyKind(toDate, DateTimeKind.Utc)) };
-                using (var call = _commonHelper.BooksClient.GetTopBorrowers(getTopBorrowersRequest))
-                {
-                    while (await call.ResponseStream.MoveNext())
-                    {
-                        var current = call.ResponseStream.Current;
-                        getTopBorrowersResponses.Add(current);
-                    }
-                }
-            }
-            finally
-            {
-                await sqlTransaction.RollbackAsync();
+                var current = call.ResponseStream.Current;
+                getTopBorrowersResponses.Add(current);
             }
 
             // Assert
@@ -165,31 +112,14 @@ namespace LibraryManagementSystem.GrpcServer.IntegrationTests.Services
         {
             // Arrange
             var getBorrowersBorrowedBookCountForEachTimeFrameResponses = new List<GetBorrowersBorrowedBookCountForEachTimeFrameResponse>();
-
-            await using var sqlConnection = new SqlConnection(_commonHelper.Settings.Database.ConnectionString);
-            await sqlConnection.OpenAsync();
-            var sqlCommand = sqlConnection.CreateCommand();
-            var sqlTransaction = sqlConnection.BeginTransaction();
-            sqlCommand.Transaction = sqlTransaction;
-
-            await CommonHelper.AddTestDataToDatabase(sqlCommand);
-
+            
             // Act
-            try
+            var getBorrowersBorrowedBookCountForEachTimeFrameRequest = new GetBorrowersBorrowedBookCountForEachTimeFrameRequest { BorrowId = borrowerId };
+            using var call = _commonHelper.BooksClient.GetBorrowersBorrowedBookCountForEachTimeFrame(getBorrowersBorrowedBookCountForEachTimeFrameRequest);
+            while (await call.ResponseStream.MoveNext())
             {
-                var getBorrowersBorrowedBookCountForEachTimeFrameRequest = new GetBorrowersBorrowedBookCountForEachTimeFrameRequest { BorrowId = borrowerId };
-                using (var call = _commonHelper.BooksClient.GetBorrowersBorrowedBookCountForEachTimeFrame(getBorrowersBorrowedBookCountForEachTimeFrameRequest))
-                {
-                    while (await call.ResponseStream.MoveNext())
-                    {
-                        var current = call.ResponseStream.Current;
-                        getBorrowersBorrowedBookCountForEachTimeFrameResponses.Add(current);
-                    }
-                }
-            }
-            finally
-            {
-                await sqlTransaction.RollbackAsync();
+                var current = call.ResponseStream.Current;
+                getBorrowersBorrowedBookCountForEachTimeFrameResponses.Add(current);
             }
 
             // Assert
@@ -212,31 +142,14 @@ namespace LibraryManagementSystem.GrpcServer.IntegrationTests.Services
         {
             // Arrange
             var getOtherBooksLoanedByBorrowersOfASpecificBookResponses = new List<GetOtherBooksLoanedByBorrowersOfASpecificBookResponse>();
-
-            await using var sqlConnection = new SqlConnection(_commonHelper.Settings.Database.ConnectionString);
-            await sqlConnection.OpenAsync();
-            var sqlCommand = sqlConnection.CreateCommand();
-            var sqlTransaction = sqlConnection.BeginTransaction();
-            sqlCommand.Transaction = sqlTransaction;
-
-            await CommonHelper.AddTestDataToDatabase(sqlCommand);
-
+            
             // Act
-            try
+            var getOtherBooksLoanedByBorrowersOfASpecificBookRequest = new GetOtherBooksLoanedByBorrowersOfASpecificBookRequest { BookId = bookId };
+            using var call = _commonHelper.BooksClient.GetOtherBooksLoanedByBorrowersOfASpecificBook(getOtherBooksLoanedByBorrowersOfASpecificBookRequest);
+            while (await call.ResponseStream.MoveNext())
             {
-                var getOtherBooksLoanedByBorrowersOfASpecificBookRequest = new GetOtherBooksLoanedByBorrowersOfASpecificBookRequest { BookId = bookId };
-                using (var call = _commonHelper.BooksClient.GetOtherBooksLoanedByBorrowersOfASpecificBook(getOtherBooksLoanedByBorrowersOfASpecificBookRequest))
-                {
-                    while (await call.ResponseStream.MoveNext())
-                    {
-                        var current = call.ResponseStream.Current;
-                        getOtherBooksLoanedByBorrowersOfASpecificBookResponses.Add(current);
-                    }
-                }
-            }
-            finally
-            {
-                await sqlTransaction.RollbackAsync();
+                var current = call.ResponseStream.Current;
+                getOtherBooksLoanedByBorrowersOfASpecificBookResponses.Add(current);
             }
 
             // Assert
@@ -260,30 +173,13 @@ namespace LibraryManagementSystem.GrpcServer.IntegrationTests.Services
         {
             // Arrange
             var getAllBooksResponses = new List<GetAllBooksResponse>();
-
-            await using var sqlConnection = new SqlConnection(_commonHelper.Settings.Database.ConnectionString);
-            await sqlConnection.OpenAsync();
-            var sqlCommand = sqlConnection.CreateCommand();
-            var sqlTransaction = sqlConnection.BeginTransaction();
-            sqlCommand.Transaction = sqlTransaction;
-
-            await CommonHelper.AddTestDataToDatabase(sqlCommand);
-
+            
             // Act
-            try
+            using var call = _commonHelper.BooksClient.GetAllBooks(new Empty());
+            while (await call.ResponseStream.MoveNext())
             {
-                using (var call = _commonHelper.BooksClient.GetAllBooks(new Empty()))
-                {
-                    while (await call.ResponseStream.MoveNext())
-                    {
-                        var current = call.ResponseStream.Current;
-                        getAllBooksResponses.Add(current);
-                    }
-                }
-            }
-            finally
-            {
-                await sqlTransaction.RollbackAsync();
+                var current = call.ResponseStream.Current;
+                getAllBooksResponses.Add(current);
             }
 
             // Assert
@@ -310,27 +206,9 @@ namespace LibraryManagementSystem.GrpcServer.IntegrationTests.Services
         [InlineData(13)]
         public async Task GetBookById(int bookId)
         {
-            // Arrange
-            GetBookByIdResponse getBookByIdResponse;
-
-            await using var sqlConnection = new SqlConnection(_commonHelper.Settings.Database.ConnectionString);
-            await sqlConnection.OpenAsync();
-            var sqlCommand = sqlConnection.CreateCommand();
-            var sqlTransaction = sqlConnection.BeginTransaction();
-            sqlCommand.Transaction = sqlTransaction;
-
-            await CommonHelper.AddTestDataToDatabase(sqlCommand);
-
             // Act
-            try
-            {
-                var getBookByIdRequest = new GetBookByIdRequest { BookId = bookId };
-                getBookByIdResponse = await _commonHelper.BooksClient.GetBookByIdAsync(getBookByIdRequest);
-            }
-            finally
-            {
-                await sqlTransaction.RollbackAsync();
-            }
+            var getBookByIdRequest = new GetBookByIdRequest { BookId = bookId };
+            var getBookByIdResponse = await _commonHelper.BooksClient.GetBookByIdAsync(getBookByIdRequest);
 
             // Assert
             Assert.NotNull(getBookByIdResponse.Result);
@@ -346,27 +224,9 @@ namespace LibraryManagementSystem.GrpcServer.IntegrationTests.Services
         [MemberData(nameof(BooksServiceTestMemberData.GetBookHistoryDetailData), MemberType = typeof(BooksServiceTestMemberData))]
         public async Task GetBookHistory(int bookId, List<DateTime> bookHistoryDetailFromDate, List<DateTime> bookHistoryDetailToDate, List<DateTime> bookHistoryDetailReturnDate, List<int> bookHistoryDetailDaysLoaned)
         {
-            // Arrange
-            GetBookHistoryResponse? getBookHistoryResponse;
-
-            await using var sqlConnection = new SqlConnection(_commonHelper.Settings.Database.ConnectionString);
-            await sqlConnection.OpenAsync();
-            var sqlCommand = sqlConnection.CreateCommand();
-            var sqlTransaction = sqlConnection.BeginTransaction();
-            sqlCommand.Transaction = sqlTransaction;
-
-            await CommonHelper.AddTestDataToDatabase(sqlCommand);
-
             // Act
-            try
-            {
-                var getBookHistoryRequest = new GetBookHistoryRequest { BookId = bookId };
-                getBookHistoryResponse = await _commonHelper.BooksClient.GetBookHistoryAsync(getBookHistoryRequest);
-            }
-            finally
-            {
-                await sqlTransaction.RollbackAsync();
-            }
+            var getBookHistoryRequest = new GetBookHistoryRequest { BookId = bookId };
+            var getBookHistoryResponse = await _commonHelper.BooksClient.GetBookHistoryAsync(getBookHistoryRequest);
 
             // Assert
             if (bookHistoryDetailFromDate.Count == 0)
@@ -395,27 +255,9 @@ namespace LibraryManagementSystem.GrpcServer.IntegrationTests.Services
         [InlineData(13, 49)]
         public async Task GetBookAverageReadRate(int bookId, int expectedAverageReadRate)
         {
-            // Arrange
-            GetBookAverageReadRateResponse getBookAverageReadRateResponse;
-
-            await using var sqlConnection = new SqlConnection(_commonHelper.Settings.Database.ConnectionString);
-            await sqlConnection.OpenAsync();
-            var sqlCommand = sqlConnection.CreateCommand();
-            var sqlTransaction = sqlConnection.BeginTransaction();
-            sqlCommand.Transaction = sqlTransaction;
-
-            await CommonHelper.AddTestDataToDatabase(sqlCommand);
-
             // Act
-            try
-            {
-                var getBookAverageReadRateRequest = new GetBookAverageReadRateRequest { BookId = bookId };
-                getBookAverageReadRateResponse = await _commonHelper.BooksClient.GetBookAverageReadRateAsync(getBookAverageReadRateRequest);
-            }
-            finally
-            {
-                await sqlTransaction.RollbackAsync();
-            }
+            var getBookAverageReadRateRequest = new GetBookAverageReadRateRequest { BookId = bookId };
+            var getBookAverageReadRateResponse = await _commonHelper.BooksClient.GetBookAverageReadRateAsync(getBookAverageReadRateRequest);
 
             // Assert
             Assert.NotNull(getBookAverageReadRateResponse.Result);
