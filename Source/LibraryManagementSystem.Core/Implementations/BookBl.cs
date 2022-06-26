@@ -24,18 +24,9 @@ namespace LibraryManagementSystem.Core.Implementations
         /// <returns>A list of <see cref="TopBookDetail"/>s.</returns>
         public async Task<List<TopBookDetail>> GetTopBorrowedBooks(int numberOfBooks)
         {
-            try
-            {
-                var books = await _bookDal.GetTopBorrowedBooks(numberOfBooks);
+            var books = await _bookDal.GetTopBorrowedBooks(numberOfBooks);
 
-                return books;
-            }
-            catch (Exception exception)
-            {
-                Console.WriteLine(exception);
-
-                throw;
-            }
+            return books;
         }
 
         /// <summary>
@@ -43,20 +34,11 @@ namespace LibraryManagementSystem.Core.Implementations
         /// </summary>
         /// <param name="bookId">Book id to get the status of.</param>
         /// <returns>A books <see cref="BookStatus"/></returns>
-        public async Task<BookStatus> GetBookStatus(int bookId)
+        public async Task<BookStatus?> GetBookStatus(int bookId)
         {
-            try
-            {
-                var bookStatus = await _bookDal.GetBookStatus(bookId);
+            var bookStatus = await _bookDal.GetBookStatus(bookId);
 
-                return bookStatus;
-            }
-            catch (Exception exception)
-            {
-                Console.WriteLine(exception);
-
-                throw;
-            }
+            return bookStatus;
         }
 
         /// <summary>
@@ -68,18 +50,9 @@ namespace LibraryManagementSystem.Core.Implementations
         /// <returns>A list of <see cref="TopBorrowerDetail"/>s.</returns>
         public async Task<List<TopBorrowerDetail>> GetTopBorrowers(int numberOfBorrowers, DateTime fromDate, DateTime toDate)
         {
-            try
-            {
-                var borrowers = await _bookDal.GetTopBorrowers(numberOfBorrowers, fromDate, toDate);
+            var borrowers = await _bookDal.GetTopBorrowers(numberOfBorrowers, fromDate, toDate);
 
-                return borrowers;
-            }
-            catch (Exception exception)
-            {
-                Console.WriteLine(exception);
-
-                throw;
-            }
+            return borrowers;
         }
 
         /// <summary>
@@ -89,18 +62,9 @@ namespace LibraryManagementSystem.Core.Implementations
         /// <returns>A list of <see cref="BorrowerBorrowedTimeFrameCount"/>s.</returns>
         public async Task<List<BorrowerBorrowedTimeFrameCount>> GetBorrowersBorrowedBookCountForEachTimeFrame(int borrowId)
         {
-            try
-            {
-                var borrowerBorrowedTimeFrameCount = await _bookDal.GetBorrowersBorrowedBookCountForEachTimeFrame(borrowId);
+            var borrowerBorrowedTimeFrameCount = await _bookDal.GetBorrowersBorrowedBookCountForEachTimeFrame(borrowId);
 
-                return borrowerBorrowedTimeFrameCount;
-            }
-            catch (Exception exception)
-            {
-                Console.WriteLine(exception);
-
-                throw;
-            }
+            return borrowerBorrowedTimeFrameCount;
         }
 
         /// <summary>
@@ -110,18 +74,9 @@ namespace LibraryManagementSystem.Core.Implementations
         /// <returns>A list of <see cref="Book"/>s.</returns>
         public async Task<List<Book>> GetOtherBooksLoanedByBorrowersOfASpecificBook(int bookId)
         {
-            try
-            {
-                var books = await _bookDal.GetOtherBooksLoanedByBorrowersOfASpecificBook(bookId);
+            var books = await _bookDal.GetOtherBooksLoanedByBorrowersOfASpecificBook(bookId);
 
-                return books;
-            }
-            catch (Exception exception)
-            {
-                Console.WriteLine(exception);
-
-                throw;
-            }
+            return books;
         }
 
         /// <summary>
@@ -130,18 +85,9 @@ namespace LibraryManagementSystem.Core.Implementations
         /// <returns>A list of <see cref="Book"/>s.</returns>
         public async Task<List<Book>> GetAllBooks()
         {
-            try
-            {
-                var books = await _bookDal.GetAllBooks();
+            var books = await _bookDal.GetAllBooks();
 
-                return books;
-            }
-            catch (Exception exception)
-            {
-                Console.WriteLine(exception);
-
-                throw;
-            }
+            return books;
         }
 
         /// <summary>
@@ -149,20 +95,11 @@ namespace LibraryManagementSystem.Core.Implementations
         /// </summary>
         /// <param name="bookId">Id of book to lookup.</param>
         /// <returns><see cref="Book"/></returns>
-        public async Task<Book> GetBookById(int bookId)
+        public async Task<Book?> GetBookById(int bookId)
         {
-            try
-            {
-                var book = await _bookDal.GetBookById(bookId);
+            var book = await _bookDal.GetBookById(bookId);
 
-                return book;
-            }
-            catch (Exception exception)
-            {
-                Console.WriteLine(exception);
-
-                throw;
-            }
+            return book;
         }
 
         /// <summary>
@@ -172,18 +109,9 @@ namespace LibraryManagementSystem.Core.Implementations
         /// <returns><see cref="Book"/></returns>
         public async Task<BookHistory?> GetBookHistory(int bookId)
         {
-            try
-            {
-                var bookHistory = await _bookDal.GetBookHistory(bookId);
+            var bookHistory = await _bookDal.GetBookHistory(bookId);
 
-                return bookHistory;
-            }
-            catch (Exception exception)
-            {
-                Console.WriteLine(exception);
-
-                throw;
-            }
+            return bookHistory;
         }
 
         /// <summary>
@@ -193,26 +121,17 @@ namespace LibraryManagementSystem.Core.Implementations
         /// <returns><see cref="Book"/></returns>
         public async Task<int> GetBookAverageReadRate(int bookId)
         {
-            try
+            var bookHistory = await _bookDal.GetBookHistory(bookId);
+
+            if (bookHistory == null)
             {
-                var bookHistory = await _bookDal.GetBookHistory(bookId);
-
-                if (bookHistory == null)
-                {
-                    return 0;
-                }
-
-                var averagePageReadRatePerPeriod = bookHistory.BookHistoryDetails!.Select(x => (int)Math.Round(bookHistory.TotalPages / (double)x.DaysLoaned, MidpointRounding.AwayFromZero)).ToList();
-                var averageReadRate = (int)Math.Round((double)averagePageReadRatePerPeriod.Sum() / bookHistory.BookHistoryDetails!.Count, MidpointRounding.AwayFromZero);
-
-                return averageReadRate;
+                return 0;
             }
-            catch (Exception exception)
-            {
-                Console.WriteLine(exception);
 
-                throw;
-            }
+            var averagePageReadRatePerPeriod = bookHistory.BookHistoryDetails!.Select(x => (int)Math.Round(bookHistory.TotalPages / (double)x.DaysLoaned, MidpointRounding.AwayFromZero)).ToList();
+            var averageReadRate = (int)Math.Round((double)averagePageReadRatePerPeriod.Sum() / bookHistory.BookHistoryDetails!.Count, MidpointRounding.AwayFromZero);
+
+            return averageReadRate;
         }
     }
 }

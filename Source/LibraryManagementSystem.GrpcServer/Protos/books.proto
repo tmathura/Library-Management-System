@@ -1,0 +1,160 @@
+syntax = "proto3";
+
+import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
+
+option csharp_namespace = "LibraryManagementSystem.GrpcServer";
+
+package books;
+
+service Books {
+	rpc GetTopBorrowedBooks (GetTopBorrowedBooksRequest) returns (stream GetTopBorrowedBooksResponse);
+	rpc GetBookStatus (GetBookStatusRequest) returns (GetBookStatusResponse);
+	rpc GetTopBorrowers (GetTopBorrowersRequest) returns (stream GetTopBorrowersResponse);
+	rpc GetBorrowersBorrowedBookCountForEachTimeFrame (GetBorrowersBorrowedBookCountForEachTimeFrameRequest) returns (stream GetBorrowersBorrowedBookCountForEachTimeFrameResponse);
+	rpc GetOtherBooksLoanedByBorrowersOfASpecificBook (GetOtherBooksLoanedByBorrowersOfASpecificBookRequest) returns (stream GetOtherBooksLoanedByBorrowersOfASpecificBookResponse);
+	rpc GetAllBooks (google.protobuf.Empty) returns (stream GetAllBooksResponse);
+	rpc GetBookById (GetBookByIdRequest) returns (GetBookByIdResponse);
+	rpc GetBookHistory (GetBookHistoryRequest) returns (GetBookHistoryResponse);
+	rpc GetBookAverageReadRate (GetBookAverageReadRateRequest) returns (GetBookAverageReadRateResponse);
+}
+
+message GetTopBorrowedBooksRequest {
+	int32 numberOfBooks = 1;
+}
+
+message GetTopBorrowedBooksResponse {
+	repeated ErrorsResponse errors = 1;
+	TopBookDetailResponse result = 2;
+}
+
+message TopBookDetailResponse {
+	BookResponse book = 1;
+	int32 copiesLoaned = 2;
+}
+
+message GetBookStatusRequest {
+	int32 bookId = 1;
+}
+
+message GetBookStatusResponse {
+	repeated ErrorsResponse errors = 1;
+	BookStatusResponse result = 2;
+}
+
+message BookStatusResponse{
+	int32 available = 1;
+	int32 borrowed = 2;
+	int32 lost = 3;
+}
+
+message GetTopBorrowersRequest {
+	int32 numberOfBorrowers = 1;
+	google.protobuf.Timestamp fromDate = 2;
+	google.protobuf.Timestamp toDate = 3;
+}
+
+message GetTopBorrowersResponse {
+	repeated ErrorsResponse errors = 1;
+	TopBorrowerDetailResponse result = 2;
+}
+
+message TopBorrowerDetailResponse {
+	Borrower borrower = 1;
+	int32 booksLoaned = 2;
+}
+
+message GetBorrowersBorrowedBookCountForEachTimeFrameRequest {
+	int32 borrowId = 1;
+}
+
+message GetBorrowersBorrowedBookCountForEachTimeFrameResponse {
+	repeated ErrorsResponse errors = 1;
+	BorrowerBorrowedTimeFrameCountResponse result = 2;
+}
+
+message BorrowerBorrowedTimeFrameCountResponse {
+	google.protobuf.Timestamp fromDate = 1;
+	google.protobuf.Timestamp toDate = 2;
+	int32 BooksLoaned = 3;
+}
+
+message GetOtherBooksLoanedByBorrowersOfASpecificBookRequest {
+	int32 bookId = 1;
+}
+
+message GetOtherBooksLoanedByBorrowersOfASpecificBookResponse {
+	repeated ErrorsResponse errors = 1;
+	BookResponse result = 2;
+}
+
+message GetAllBooksResponse {
+	repeated ErrorsResponse errors = 1;
+	BookResponse result = 2;
+}
+
+message GetBookByIdRequest {
+	int32 bookId = 1;
+}
+
+message GetBookByIdResponse {
+	repeated ErrorsResponse errors = 1;
+	BookResponse result = 2;
+}
+
+message GetBookHistoryRequest {
+	int32 bookId = 1;
+}
+
+message GetBookHistoryResponse {
+	repeated ErrorsResponse errors = 1;
+	BookHistoryResponse result = 2;
+}
+
+message BookHistoryResponse {
+	BookResponse book = 1;
+	repeated BookHistoryDetail bookHistoryDetails = 2;
+}
+
+message GetBookAverageReadRateRequest {
+	int32 bookId = 1;
+}
+
+message GetBookAverageReadRateResponse {
+	repeated ErrorsResponse errors = 1;
+	BookAverageReadRateResponse result = 2;
+}
+
+message BookAverageReadRateResponse {
+	int32 bookAverageReadRate = 1;
+}
+
+message BookResponse {
+	int32 id = 1;
+	int64 isbn = 2;
+	string title = 3;
+	string description = 4;
+	int32 totalPages = 5;
+	google.protobuf.Timestamp publishedDate = 6;
+	int32 publisherId = 7;
+}
+
+message Borrower {
+	int32 id = 1;
+	string firstName = 2;
+	string lastName = 3;
+	string contactNumber = 4;
+	string address = 5;
+}
+
+message BookHistoryDetail {
+	google.protobuf.Timestamp fromDate = 1;
+	google.protobuf.Timestamp toDate = 2;
+	google.protobuf.Timestamp returnDate = 3;
+	int32 daysLoaned = 4;
+}
+
+message ErrorsResponse {
+	string Message = 1;
+	string stackTrace = 2;
+}

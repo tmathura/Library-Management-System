@@ -251,7 +251,7 @@ namespace LibraryManagementSystem.Infrastructure.IntegrationTests.Implementation
         /// </summary>
         [Theory]
         [MemberData(nameof(BookDalTestMemberData.GetBookHistoryDetailData), MemberType = typeof(BookDalTestMemberData))]
-        public async Task GetBookHistoryDetail(int bookId, List<DateTime> bookHistoryDetailFromDate, List<DateTime> bookHistoryDetailToDate, List<DateTime> bookHistoryDetailReturnDate, List<int> bookHistoryDetailDaysLoaned)
+        public async Task GetBookHistory(int bookId, List<DateTime> bookHistoryDetailFromDate, List<DateTime> bookHistoryDetailToDate, List<DateTime> bookHistoryDetailReturnDate, List<int> bookHistoryDetailDaysLoaned)
         {
             // Arrange
             BookHistory? bookHistory;

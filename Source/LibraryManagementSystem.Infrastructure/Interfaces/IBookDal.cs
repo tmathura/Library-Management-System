@@ -19,7 +19,7 @@ namespace LibraryManagementSystem.Infrastructure.Interfaces
         /// </summary>
         /// <param name="bookId">Book id to get the status of.</param>
         /// <returns>A books <see cref="BookStatus"/></returns>
-        Task<BookStatus> GetBookStatus(int bookId);
+        Task<BookStatus?> GetBookStatus(int bookId);
 
         /// <summary>
         /// Get the top borrowers.
@@ -55,7 +55,7 @@ namespace LibraryManagementSystem.Infrastructure.Interfaces
         /// </summary>
         /// <param name="bookId">Id of book to lookup.</param>
         /// <returns><see cref="Book"/></returns>
-        Task<Book> GetBookById(int bookId);
+        Task<Book?> GetBookById(int bookId);
 
         /// <summary>
         /// Get the loan history of a book.

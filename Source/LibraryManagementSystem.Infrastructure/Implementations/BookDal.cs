@@ -39,12 +39,9 @@ namespace LibraryManagementSystem.Infrastructure.Implementations
 
                 await sqlTransaction.CommitAsync();
             }
-            catch (Exception exception)
+            catch (Exception)
             {
-                Console.WriteLine(exception);
-
                 await sqlTransaction.RollbackAsync();
-
                 throw;
             }
 
@@ -92,10 +89,10 @@ namespace LibraryManagementSystem.Infrastructure.Implementations
         /// Get the status of a book/>.
         /// </summary>
         /// <param name="bookId">Book id to get the status of.</param>
-        /// <returns>A books <see cref="BookStatus"/></returns>
-        public async Task<BookStatus> GetBookStatus(int bookId)
+        /// <returns>A books <see cref="BookStatus?"/></returns>
+        public async Task<BookStatus?> GetBookStatus(int bookId)
         {
-            BookStatus bookStatus;
+            BookStatus? bookStatus;
 
             await using var sqlConnection = new SqlConnection(_connectionString);
             await sqlConnection.OpenAsync();
@@ -109,12 +106,9 @@ namespace LibraryManagementSystem.Infrastructure.Implementations
 
                 await sqlTransaction.CommitAsync();
             }
-            catch (Exception exception)
+            catch (Exception)
             {
-                Console.WriteLine(exception);
-
                 await sqlTransaction.RollbackAsync();
-
                 throw;
             }
 
@@ -127,9 +121,9 @@ namespace LibraryManagementSystem.Infrastructure.Implementations
         /// <param name="sqlCommand">The SqlCommand to use when interacting with the database.</param>
         /// <param name="bookId">Book id to get the status of.</param>
         /// <returns>A books <see cref="BookStatus"/></returns>
-        public static async Task<BookStatus> GetBookStatus(SqlCommand sqlCommand, int bookId)
+        public static async Task<BookStatus?> GetBookStatus(SqlCommand sqlCommand, int bookId)
         {
-            var bookStatus = new BookStatus();
+            BookStatus? bookStatus = null;
 
             sqlCommand.CommandType = CommandType.StoredProcedure;
             sqlCommand.CommandText = "[dbo].[book_status_get]";
@@ -140,9 +134,12 @@ namespace LibraryManagementSystem.Infrastructure.Implementations
             await using var sqlDataReader = await sqlCommand.ExecuteReaderAsync();
             while (await sqlDataReader.ReadAsync())
             {
-                bookStatus.Available = Convert.ToInt32(sqlDataReader["available"]);
-                bookStatus.Borrowed = Convert.ToInt32(sqlDataReader["borrowed"]);
-                bookStatus.Lost = Convert.ToInt32(sqlDataReader["lost"]);
+                bookStatus = new BookStatus
+                {
+                    Available = Convert.ToInt32(sqlDataReader["available"]),
+                    Borrowed = Convert.ToInt32(sqlDataReader["borrowed"]),
+                    Lost = Convert.ToInt32(sqlDataReader["lost"])
+                };
             }
 
             return bookStatus;
@@ -171,12 +168,9 @@ namespace LibraryManagementSystem.Infrastructure.Implementations
 
                 await sqlTransaction.CommitAsync();
             }
-            catch (Exception exception)
+            catch (Exception)
             {
-                Console.WriteLine(exception);
-
                 await sqlTransaction.RollbackAsync();
-
                 throw;
             }
 
@@ -243,12 +237,10 @@ namespace LibraryManagementSystem.Infrastructure.Implementations
 
                 await sqlTransaction.CommitAsync();
             }
-            catch (Exception exception)
+            catch (Exception)
             {
-                Console.WriteLine(exception);
 
                 await sqlTransaction.RollbackAsync();
-
                 throw;
             }
 
@@ -308,12 +300,10 @@ namespace LibraryManagementSystem.Infrastructure.Implementations
 
                 await sqlTransaction.CommitAsync();
             }
-            catch (Exception exception)
+            catch (Exception)
             {
-                Console.WriteLine(exception);
 
                 await sqlTransaction.RollbackAsync();
-
                 throw;
             }
 
@@ -376,10 +366,8 @@ namespace LibraryManagementSystem.Infrastructure.Implementations
 
                 await sqlTransaction.CommitAsync();
             }
-            catch (Exception exception)
+            catch (Exception)
             {
-                Console.WriteLine(exception);
-
                 await sqlTransaction.RollbackAsync();
                 throw;
             }
@@ -392,7 +380,7 @@ namespace LibraryManagementSystem.Infrastructure.Implementations
         /// </summary>
         /// <param name="bookId">Id of book to lookup.</param>
         /// <returns><see cref="Book"/></returns>
-        public async Task<Book> GetBookById(int bookId)
+        public async Task<Book?> GetBookById(int bookId)
         {
             Book book;
 
@@ -410,10 +398,8 @@ namespace LibraryManagementSystem.Infrastructure.Implementations
 
                 await sqlTransaction.CommitAsync();
             }
-            catch (Exception exception)
+            catch (Exception)
             {
-                Console.WriteLine(exception);
-
                 await sqlTransaction.RollbackAsync();
                 throw;
             }
@@ -478,12 +464,9 @@ namespace LibraryManagementSystem.Infrastructure.Implementations
 
                 await sqlTransaction.CommitAsync();
             }
-            catch (Exception exception)
+            catch (Exception)
             {
-                Console.WriteLine(exception);
-
                 await sqlTransaction.RollbackAsync();
-
                 throw;
             }
 
@@ -498,7 +481,7 @@ namespace LibraryManagementSystem.Infrastructure.Implementations
         /// <returns>A books <see cref="BookHistory"/></returns>
         public static async Task<BookHistory?> GetBookHistory(SqlCommand sqlCommand, int bookId)
         {
-            var bookHistory = new BookHistory();
+            BookHistory? bookHistory = null;
             var bookHistoryDetails = new List<BookHistoryDetail>();
 
             sqlCommand.CommandType = CommandType.StoredProcedure;
@@ -510,6 +493,8 @@ namespace LibraryManagementSystem.Infrastructure.Implementations
             await using var sqlDataReader = await sqlCommand.ExecuteReaderAsync();
             while (await sqlDataReader.ReadAsync())
             {
+                bookHistory ??= new BookHistory();
+
                 if (bookHistory.Id == 0)
                 {
                     bookHistory.Id = Convert.ToInt32(sqlDataReader["id"]);
@@ -532,13 +517,11 @@ namespace LibraryManagementSystem.Infrastructure.Implementations
                 bookHistoryDetails.Add(bookHistoryDetail);
             }
 
-            if (bookHistory.Id == 0)
+            if (bookHistory != null)
             {
-                return null;
+                bookHistory.BookHistoryDetails = bookHistoryDetails;
             }
-
-            bookHistory.BookHistoryDetails = bookHistoryDetails;
-
+            
             return bookHistory;
         }
     }
