@@ -49,6 +49,35 @@ namespace LibraryManagementSystem.GrpcServer.IntegrationTests.Services
         }
 
         /// <summary>
+        /// Verify null Result when no top books.
+        /// </summary>
+        [Theory]
+        [InlineData(0)]
+        public async Task GetTopBorrowedBooks_NoTopBooks(int numberOfTopBooks)
+        {
+            // Arrange
+            var getTopBorrowedBooksResponses = new List<GetTopBorrowedBooksResponse>();
+
+            // Act
+            var getTopBorrowedBooksRequest = new GetTopBorrowedBooksRequest { NumberOfBooks = numberOfTopBooks };
+            using var call = _commonHelper.BooksClient.GetTopBorrowedBooks(getTopBorrowedBooksRequest);
+            while (await call.ResponseStream.MoveNext())
+            {
+                var current = call.ResponseStream.Current;
+                getTopBorrowedBooksResponses.Add(current);
+            }
+
+            // Assert
+            Assert.Single(getTopBorrowedBooksResponses);
+
+            foreach (var getTopBorrowedBooksResponse in getTopBorrowedBooksResponses)
+            {
+                Assert.Null(getTopBorrowedBooksResponse.Result);
+                Assert.Empty(getTopBorrowedBooksResponse.Errors);
+            }
+        }
+
+        /// <summary>
         /// Verify the status (available, borrowed, lost) of a book is equal to the expected member data.
         /// </summary>
         [Theory]
@@ -66,6 +95,29 @@ namespace LibraryManagementSystem.GrpcServer.IntegrationTests.Services
             Assert.Equal(numberAvailable, getBookStatusResponse.Result.Available);
             Assert.Equal(numberBorrowed, getBookStatusResponse.Result.Borrowed);
             Assert.Equal(numberLost, getBookStatusResponse.Result.Lost);
+
+            _outputHelper.WriteLine($"Number of available books are: {getBookStatusResponse.Result.Available}.");
+            _outputHelper.WriteLine($"Number of borrowed books are: {getBookStatusResponse.Result.Borrowed}.");
+            _outputHelper.WriteLine($"Number of lost books are: {getBookStatusResponse.Result.Lost}.");
+        }
+
+        /// <summary>
+        /// Verify the status (available, borrowed, lost) of a book that does not exist is zero.
+        /// </summary>
+        [Theory]
+        [InlineData(999, 0)]
+        public async Task GetBookStatus_Invalid_BookId(int bookId, int expected)
+        {
+            // Act
+            var getBookStatusRequest = new GetBookStatusRequest { BookId = bookId };
+            var getBookStatusResponse = await _commonHelper.BooksClient.GetBookStatusAsync(getBookStatusRequest);
+
+            // Assert
+            Assert.NotNull(getBookStatusResponse.Result);
+            Assert.Empty(getBookStatusResponse.Errors);
+            Assert.Equal(expected, getBookStatusResponse.Result.Available);
+            Assert.Equal(expected, getBookStatusResponse.Result.Borrowed);
+            Assert.Equal(expected, getBookStatusResponse.Result.Lost);
 
             _outputHelper.WriteLine($"Number of available books are: {getBookStatusResponse.Result.Available}.");
             _outputHelper.WriteLine($"Number of borrowed books are: {getBookStatusResponse.Result.Borrowed}.");
@@ -104,6 +156,35 @@ namespace LibraryManagementSystem.GrpcServer.IntegrationTests.Services
         }
 
         /// <summary>
+        /// Verify null Result when no top borrowers.
+        /// </summary>
+        [Theory]
+        [InlineData(0)]
+        public async Task GetTopBorrowers_Invalid_BorrowId(int numberOfTopBorrowers)
+        {
+            // Arrange
+            var getTopBorrowersResponses = new List<GetTopBorrowersResponse>();
+
+            // Act
+            var getTopBorrowersRequest = new GetTopBorrowersRequest { NumberOfBorrowers = numberOfTopBorrowers, FromDate = Timestamp.FromDateTime(DateTime.SpecifyKind(DateTime.Now, DateTimeKind.Utc)), ToDate = Timestamp.FromDateTime(DateTime.SpecifyKind(DateTime.Now, DateTimeKind.Utc)) };
+            using var call = _commonHelper.BooksClient.GetTopBorrowers(getTopBorrowersRequest);
+            while (await call.ResponseStream.MoveNext())
+            {
+                var current = call.ResponseStream.Current;
+                getTopBorrowersResponses.Add(current);
+            }
+
+            // Assert
+            Assert.Single(getTopBorrowersResponses);
+
+            foreach (var getTopBorrowersResponse in getTopBorrowersResponses)
+            {
+                Assert.Null(getTopBorrowersResponse.Result);
+                Assert.Empty(getTopBorrowersResponse.Errors);
+            }
+        }
+
+        /// <summary>
         /// Test the borrowers borrowed book count for each time frame is equal to what is in the expected member data.
         /// </summary>
         [Theory]
@@ -112,7 +193,7 @@ namespace LibraryManagementSystem.GrpcServer.IntegrationTests.Services
         {
             // Arrange
             var getBorrowersBorrowedBookCountForEachTimeFrameResponses = new List<GetBorrowersBorrowedBookCountForEachTimeFrameResponse>();
-            
+
             // Act
             var getBorrowersBorrowedBookCountForEachTimeFrameRequest = new GetBorrowersBorrowedBookCountForEachTimeFrameRequest { BorrowId = borrowerId };
             using var call = _commonHelper.BooksClient.GetBorrowersBorrowedBookCountForEachTimeFrame(getBorrowersBorrowedBookCountForEachTimeFrameRequest);
@@ -130,6 +211,33 @@ namespace LibraryManagementSystem.GrpcServer.IntegrationTests.Services
                 Assert.Equal(fromDateTimeFrameData[i], getBorrowersBorrowedBookCountForEachTimeFrameResponses[i].Result.FromDate.ToDateTime());
                 Assert.Equal(toDateTimeFrameData[i], getBorrowersBorrowedBookCountForEachTimeFrameResponses[i].Result.ToDate.ToDateTime());
                 Assert.Equal(booksLoaned[i], getBorrowersBorrowedBookCountForEachTimeFrameResponses[i].Result.BooksLoaned);
+            }
+        }
+
+        /// <summary>
+        /// Verify null Result when no top borrowers.
+        /// </summary>
+        [Theory]
+        [InlineData(999)]
+        public async Task GetBorrowersBorrowedBookCountForEachTimeFrame_Invalid_BorrowId(int borrowerId)
+        {
+            // Arrange
+            var getBorrowersBorrowedBookCountForEachTimeFrameResponses = new List<GetBorrowersBorrowedBookCountForEachTimeFrameResponse>();
+            
+            // Act
+            var getBorrowersBorrowedBookCountForEachTimeFrameRequest = new GetBorrowersBorrowedBookCountForEachTimeFrameRequest { BorrowId = borrowerId };
+            using var call = _commonHelper.BooksClient.GetBorrowersBorrowedBookCountForEachTimeFrame(getBorrowersBorrowedBookCountForEachTimeFrameRequest);
+            while (await call.ResponseStream.MoveNext())
+            {
+                var current = call.ResponseStream.Current;
+                getBorrowersBorrowedBookCountForEachTimeFrameResponses.Add(current);
+            }
+
+            // Assert
+            foreach (var getBorrowersBorrowedBookCountForEachTimeFrameResponse in getBorrowersBorrowedBookCountForEachTimeFrameResponses)
+            {
+                Assert.Null(getBorrowersBorrowedBookCountForEachTimeFrameResponse.Result);
+                Assert.Empty(getBorrowersBorrowedBookCountForEachTimeFrameResponse.Errors);
             }
         }
 
@@ -161,6 +269,35 @@ namespace LibraryManagementSystem.GrpcServer.IntegrationTests.Services
                 Assert.Empty(getOtherBooksLoanedByBorrowersOfASpecificBookResponses[i].Errors);
                 Assert.Equal(otherBorrowedBooksData[i], getOtherBooksLoanedByBorrowersOfASpecificBookResponses[i].Result.Id);
                 _outputHelper.WriteLine($"One of the other books are: {getOtherBooksLoanedByBorrowersOfASpecificBookResponses[i].Result.Title}.");
+            }
+        }
+
+        /// <summary>
+        /// Verify null Result when an invalid book id.
+        /// </summary>
+        [Theory]
+        [InlineData(0)]
+        public async Task GetOtherBooksLoanedByBorrowersOfASpecificBook_Invalid_BookId(int bookId)
+        {
+            // Arrange
+            var getOtherBooksLoanedByBorrowersOfASpecificBookResponses = new List<GetOtherBooksLoanedByBorrowersOfASpecificBookResponse>();
+
+            // Act
+            var getOtherBooksLoanedByBorrowersOfASpecificBookRequest = new GetOtherBooksLoanedByBorrowersOfASpecificBookRequest { BookId = bookId };
+            using var call = _commonHelper.BooksClient.GetOtherBooksLoanedByBorrowersOfASpecificBook(getOtherBooksLoanedByBorrowersOfASpecificBookRequest);
+            while (await call.ResponseStream.MoveNext())
+            {
+                var current = call.ResponseStream.Current;
+                getOtherBooksLoanedByBorrowersOfASpecificBookResponses.Add(current);
+            }
+
+            // Assert
+            Assert.Single(getOtherBooksLoanedByBorrowersOfASpecificBookResponses);
+
+            foreach (var getOtherBooksLoanedByBorrowersOfASpecificBookResponse in getOtherBooksLoanedByBorrowersOfASpecificBookResponses)
+            {
+                Assert.Null(getOtherBooksLoanedByBorrowersOfASpecificBookResponse.Result);
+                Assert.Empty(getOtherBooksLoanedByBorrowersOfASpecificBookResponse.Errors);
             }
         }
 
@@ -218,6 +355,22 @@ namespace LibraryManagementSystem.GrpcServer.IntegrationTests.Services
         }
 
         /// <summary>
+        /// Verify null Result when invalid book id.
+        /// </summary>
+        [Theory]
+        [InlineData(999)]
+        public async Task GetBookById_Invalid_BookId(int bookId)
+        {
+            // Act
+            var getBookByIdRequest = new GetBookByIdRequest { BookId = bookId };
+            var getBookByIdResponse = await _commonHelper.BooksClient.GetBookByIdAsync(getBookByIdRequest);
+
+            // Assert
+            Assert.Null(getBookByIdResponse.Result);
+            Assert.Empty(getBookByIdResponse.Errors);
+        }
+
+        /// <summary>
         /// Test a book loan history is equal to the expected member data.
         /// </summary>
         [Theory]
@@ -232,6 +385,7 @@ namespace LibraryManagementSystem.GrpcServer.IntegrationTests.Services
             if (bookHistoryDetailFromDate.Count == 0)
             {
                 Assert.Null(getBookHistoryResponse.Result);
+                Assert.Empty(getBookHistoryResponse.Errors);
             }
             else
             {
@@ -253,6 +407,8 @@ namespace LibraryManagementSystem.GrpcServer.IntegrationTests.Services
         /// </summary>
         [Theory]
         [InlineData(13, 49)]
+        [InlineData(6, 0)]
+        [InlineData(999, 0)] // Book iid does not exist and should have a average read rate of 0.
         public async Task GetBookAverageReadRate(int bookId, int expectedAverageReadRate)
         {
             // Act

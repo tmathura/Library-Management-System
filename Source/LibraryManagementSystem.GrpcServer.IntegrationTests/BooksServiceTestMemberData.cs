@@ -36,6 +36,14 @@
         {
             yield return new object?[]
             {
+                999,
+                new List<DateTime>(),
+                new List<DateTime>(),
+                new List<DateTime>(),
+                new List<int>()
+            };
+            yield return new object?[]
+            {
                 5,
                 new List<DateTime>(),
                 new List<DateTime>(),
