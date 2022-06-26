@@ -1,4 +1,4 @@
-name: Build .NET
+name: Build & Test
 
 on:
   push:
@@ -21,3 +21,5 @@ jobs:
       run: dotnet restore Source/LibraryManagementSystem.sln
     - name: Build
       run: dotnet build Source/LibraryManagementSystem.sln --no-restore
+    - name: Test
+      run: dotnet test Source//LibraryManagementSystem.Core.UnitTests/LibraryManagementSystem.Core.UnitTests.csproj --no-build --verbosity normal
