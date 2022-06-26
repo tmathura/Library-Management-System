@@ -65,7 +65,7 @@ namespace LibraryManagementSystem.Infrastructure.IntegrationTests.Implementation
         public async Task GetBookStatus(int bookId, int numberAvailable, int numberBorrowed, int numberLost)
         {
             // Arrange
-            BookStatus bookStatus;
+            BookStatus? bookStatus;
 
             await using var sqlConnection = new SqlConnection(_commonHelper.Settings.Database.ConnectionString);
             await sqlConnection.OpenAsync();
@@ -86,7 +86,8 @@ namespace LibraryManagementSystem.Infrastructure.IntegrationTests.Implementation
             }
 
             // Assert
-            Assert.Equal(numberAvailable, bookStatus.Available);
+            Assert.NotNull(bookStatus);
+            Assert.Equal(numberAvailable, bookStatus!.Available);
             Assert.Equal(numberBorrowed, bookStatus.Borrowed);
             Assert.Equal(numberLost, bookStatus.Lost);
 
